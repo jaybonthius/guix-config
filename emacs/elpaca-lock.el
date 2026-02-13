@@ -180,6 +180,18 @@
                      :source "elpaca-menu-lock-file" :protocol https :inherit t
                      :depth treeless :ref
                      "6ac1634612dbd42f7eb81ecaf022bd239aabb954"))
+ (lithium :source "elpaca-menu-lock-file" :recipe
+          (:package "lithium" :fetcher github :repo "countvajhula/lithium"
+                    :files
+                    ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo"
+                     "doc/dir" "doc/*.info" "doc/*.texi" "doc/*.texinfo"
+                     "lisp/*.el" "docs/dir" "docs/*.info" "docs/*.texi"
+                     "docs/*.texinfo"
+                     (:exclude ".dir-locals.el" "test.el" "tests.el" "*-test.el"
+                               "*-tests.el" "LICENSE" "README*" "*-pkg.el"))
+                    :source "elpaca-menu-lock-file" :protocol https :inherit t
+                    :depth treeless :ref
+                    "d8a8e1287df0d42e0357f8dda450d2c2c0294a75"))
  (llama :source "elpaca-menu-lock-file" :recipe
         (:package "llama" :fetcher github :repo "tarsius/llama" :files
                   ("llama.el" ".dir-locals.el") :source "elpaca-menu-lock-file"
@@ -202,6 +214,17 @@
                           :source "elpaca-menu-lock-file" :protocol https
                           :inherit t :depth treeless :ref
                           "96d274457baea419fe7b3acbc955c8527d720024"))
+ (mantra :source "elpaca-menu-lock-file" :recipe
+         (:package "mantra" :fetcher github :repo "countvajhula/mantra" :files
+                   ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo"
+                    "doc/dir" "doc/*.info" "doc/*.texi" "doc/*.texinfo"
+                    "lisp/*.el" "docs/dir" "docs/*.info" "docs/*.texi"
+                    "docs/*.texinfo"
+                    (:exclude ".dir-locals.el" "test.el" "tests.el" "*-test.el"
+                              "*-tests.el" "LICENSE" "README*" "*-pkg.el"))
+                   :source "elpaca-menu-lock-file" :protocol https :inherit t
+                   :depth treeless :ref
+                   "49f885b8947662bc837297f5c8a225d65dafcacd"))
  (marginalia :source "elpaca-menu-lock-file" :recipe
              (:package "marginalia" :repo "minad/marginalia" :fetcher github
                        :files
@@ -215,6 +238,16 @@
                        :source "elpaca-menu-lock-file" :protocol https :inherit
                        t :depth treeless :ref
                        "0d08fbea0f1182627891240780081ba528c1348b"))
+ (meow :source "elpaca-menu-lock-file" :recipe
+       (:package "meow" :repo "meow-edit/meow" :fetcher github :files
+                 ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo" "doc/dir"
+                  "doc/*.info" "doc/*.texi" "doc/*.texinfo" "lisp/*.el"
+                  "docs/dir" "docs/*.info" "docs/*.texi" "docs/*.texinfo"
+                  (:exclude ".dir-locals.el" "test.el" "tests.el" "*-test.el"
+                            "*-tests.el" "LICENSE" "README*" "*-pkg.el"))
+                 :source "elpaca-menu-lock-file" :protocol https :inherit t
+                 :depth treeless :host github :ref
+                 "2246f593552c6208bac533de9af04b085fafa6fa"))
  (olivetti :source "elpaca-menu-lock-file" :recipe
            (:package "olivetti" :fetcher github :repo "rnkn/olivetti" :files
                      ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo"
@@ -253,6 +286,18 @@
                              :source "elpaca-menu-lock-file" :protocol https
                              :inherit t :depth treeless :ref
                              "f54aa2b96f6ed249e103346cdb872c97c3c98054"))
+ (paredit :source "elpaca-menu-lock-file" :recipe
+          (:package "paredit" :fetcher git :url
+                    "https://paredit.org/paredit.git" :files
+                    ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo"
+                     "doc/dir" "doc/*.info" "doc/*.texi" "doc/*.texinfo"
+                     "lisp/*.el" "docs/dir" "docs/*.info" "docs/*.texi"
+                     "docs/*.texinfo"
+                     (:exclude ".dir-locals.el" "test.el" "tests.el" "*-test.el"
+                               "*-tests.el" "LICENSE" "README*" "*-pkg.el"))
+                    :source "elpaca-menu-lock-file" :protocol https :inherit t
+                    :depth treeless :ref
+                    "af075775af91f2dbc63b915d762b4aec092946c4"))
  (persist-text-scale :source "elpaca-menu-lock-file" :recipe
                      (:package "persist-text-scale" :fetcher github :repo
                                "jamescherti/persist-text-scale.el" :files
@@ -277,6 +322,30 @@
                   :source "elpaca-menu-lock-file" :protocol https :inherit t
                   :depth treeless :ref
                   "45a0b759076ce4139aba36dde0a2904136282e73"))
+ (pubsub :source "elpaca-menu-lock-file" :recipe
+         (:package "pubsub" :fetcher github :repo "countvajhula/pubsub" :files
+                   ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo"
+                    "doc/dir" "doc/*.info" "doc/*.texi" "doc/*.texinfo"
+                    "lisp/*.el" "docs/dir" "docs/*.info" "docs/*.texi"
+                    "docs/*.texinfo"
+                    (:exclude ".dir-locals.el" "test.el" "tests.el" "*-test.el"
+                              "*-tests.el" "LICENSE" "README*" "*-pkg.el"))
+                   :source "elpaca-menu-lock-file" :protocol https :inherit t
+                   :depth treeless :ref
+                   "f1e2b72d773b5221d577c64c868716ef0df2de53"))
+ (repeat-ring :source "elpaca-menu-lock-file" :recipe
+              (:package "repeat-ring" :fetcher github :repo
+                        "countvajhula/repeat-ring" :files
+                        ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo"
+                         "doc/dir" "doc/*.info" "doc/*.texi" "doc/*.texinfo"
+                         "lisp/*.el" "docs/dir" "docs/*.info" "docs/*.texi"
+                         "docs/*.texinfo"
+                         (:exclude ".dir-locals.el" "test.el" "tests.el"
+                                   "*-test.el" "*-tests.el" "LICENSE" "README*"
+                                   "*-pkg.el"))
+                        :source "elpaca-menu-lock-file" :protocol https :inherit
+                        t :depth treeless :ref
+                        "824bda59af6bb9f15b6616bf2f45b667ae0fddf6"))
  (s :source "elpaca-menu-lock-file" :recipe
     (:package "s" :fetcher github :repo "magnars/s.el" :files
               ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo" "doc/dir"
@@ -286,6 +355,22 @@
                          "*-tests.el" "LICENSE" "README*" "*-pkg.el"))
               :source "elpaca-menu-lock-file" :protocol https :inherit t :depth
               treeless :ref "dda84d38fffdaf0c9b12837b504b402af910d01d"))
+ (symex :source "elpaca-menu-lock-file" :recipe
+        (:source "elpaca-menu-lock-file" :protocol https :inherit t :depth
+                 treeless :host github :repo "drym-org/symex.el" :files
+                 ("symex/symex*.el" "symex/doc/*.texi" "symex/doc/figures")
+                 :package "symex" :ref
+                 "64c863d84355f1d4618c5f77f14996d37f7bf2d4"))
+ (symex-core :source "elpaca-menu-lock-file" :recipe
+             (:source "elpaca-menu-lock-file" :protocol https :inherit t :depth
+                      treeless :host github :repo "drym-org/symex.el" :files
+                      ("symex-core/symex*.el") :package "symex-core" :ref
+                      "64c863d84355f1d4618c5f77f14996d37f7bf2d4"))
+ (symex-ide :source "elpaca-menu-lock-file" :recipe
+            (:source "elpaca-menu-lock-file" :protocol https :inherit t :depth
+                     treeless :host github :repo "drym-org/symex.el" :files
+                     ("symex-ide/symex*.el") :package "symex-ide" :ref
+                     "64c863d84355f1d4618c5f77f14996d37f7bf2d4"))
  (transient :source "elpaca-menu-lock-file" :recipe
             (:package "transient" :fetcher github :repo "magit/transient" :files
                       ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo"
@@ -375,6 +460,19 @@
                     :source "elpaca-menu-lock-file" :protocol https :inherit t
                     :depth treeless :ref
                     "93f15873d7d6244d72202c5dd7724a030a2d5b9a"))
+ (virtual-ring :source "elpaca-menu-lock-file" :recipe
+               (:package "virtual-ring" :fetcher github :repo
+                         "countvajhula/virtual-ring" :files
+                         ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo"
+                          "doc/dir" "doc/*.info" "doc/*.texi" "doc/*.texinfo"
+                          "lisp/*.el" "docs/dir" "docs/*.info" "docs/*.texi"
+                          "docs/*.texinfo"
+                          (:exclude ".dir-locals.el" "test.el" "tests.el"
+                                    "*-test.el" "*-tests.el" "LICENSE" "README*"
+                                    "*-pkg.el"))
+                         :source "elpaca-menu-lock-file" :protocol https
+                         :inherit t :depth treeless :ref
+                         "2d51ae8104f847c508abc3fe32663411449548f6"))
  (with-editor :source "elpaca-menu-lock-file" :recipe
               (:package "with-editor" :fetcher github :repo "magit/with-editor"
                         :files
