@@ -135,7 +135,17 @@
 ;;; UI & appearance
 ;;; ============================================================================
 
-;; Tab bar: hide by default, use tab-bar-history for window undo/redo.
+;;; Font & cursor
+
+(set-face-attribute 'default nil
+                    :family "Fira Code"
+                    :height 140
+                    :weight 'regular)
+
+(setq-default cursor-type 'bar)
+
+;;; Tab bar: hidden, with history-based window undo/redo.
+
 (use-package tab-bar
   :ensure nil
   :bind (("C-c <left>" . tab-bar-history-back)
@@ -145,19 +155,33 @@
   :config
   (tab-bar-history-mode 1))
 
-;; Default font size: 14pt (140 = 14.0pt in Emacs units).
-(set-face-attribute 'default nil :height 140)
+;;; Themes
 
 ;; twilight-bright-theme: a clean light theme (bogdan's fork).
 (use-package twilight-bright-theme
   :ensure (:host github :repo "Bogdanp/twilight-bright-theme.el")
-  :config
-  (mapc #'disable-theme custom-enabled-themes)
-  (load-theme 'twilight-bright t))
+  :demand t)
 
 ;; twilight-anti-bright-theme: the dark counterpart (bogdan's fork).
 (use-package twilight-anti-bright-theme
-  :ensure (:host github :repo "Bogdanp/twilight-anti-bright-theme"))
+  :ensure (:host github :repo "Bogdanp/twilight-anti-bright-theme")
+  :demand t)
+
+(defun jb-system-dark-mode-p ()
+  "Return non-nil if macOS is in dark mode."
+  (when (eq system-type 'darwin)
+    (string-match-p
+     "Dark"
+     (shell-command-to-string
+      "defaults read -g AppleInterfaceStyle 2>/dev/null || echo Light"))))
+
+(defun jb-detect-and-apply-system-theme ()
+  "Detect macOS appearance and load the matching twilight theme."
+  (interactive)
+  (mapc #'disable-theme custom-enabled-themes)
+  (if (jb-system-dark-mode-p)
+      (load-theme 'twilight-anti-bright t)
+    (load-theme 'twilight-bright t)))
 
 (defun toggle-twilight-theme ()
   "Toggle between twilight-bright and twilight-anti-bright themes."
@@ -167,6 +191,128 @@
     (if (eq current 'twilight-bright)
         (load-theme 'twilight-anti-bright t)
       (load-theme 'twilight-bright t))))
+
+;; Apply system theme after Elpaca has installed and activated theme packages.
+(add-hook 'elpaca-after-init-hook #'jb-detect-and-apply-system-theme)
+
+;;; Ligatures
+
+(use-package ligature
+  :ensure t
+  :config
+  (ligature-set-ligatures t '("www"))
+  (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
+  (ligature-set-ligatures 'prog-mode
+                          '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "***" "||=" "||>"
+                            ":::" "::=" "=:=" "===" "==>" "=!=" "=>>" "=<<" "=/=" "!=="
+                            "!!." ">=>" ">>=" ">>>" ">>-" ">->" "->>" "-->" "---" "-<<"
+                            "<~~" "<~>" "<*>" "<||" "<|>" "<$>" "<==" "<=>" "<=<" "<->"
+                            "<--" "<-<" "<<=" "<<-" "<<<" "<+>" "</>" "###" "#_(" "..<"
+                            "..." "+++" "/==" "///" "_|_" "www" "&&" "^=" "~~" "~@" "~="
+                            "~>" "~-" "**" "*>" "*/" "||" "|}" "|]" "|=" "|>" "|-" "{|"
+                            "[|" "]#" "::" ":=" ":>" ":<" "$>" "==" "=>" "!=" "!!" ">:"
+                            ">=" ">>" ">-" "-~" "-|" "->" "--" "-<" "<~" "<*" "<|" "<:"
+                            "<$" "<=" "<>" "<-" "<<" "<+" "</" "#{" "#[" "#:" "#=" "#!"
+                            "##" "#(" "#?" "#_" "%%" ".=" ".-" ".." ".?" "+>" "++" "?:"
+                            "?=" "?." "??" ";;" "/*" "/=" "/>" "//" "__" "~~" "(*" "*)"
+                            "\\\\" "://"))
+  (global-ligature-mode t))
+
+;;; Centering
+
+(use-package olivetti
+  :ensure t
+  :custom
+  (olivetti-body-width 100))
+
+(use-package auto-olivetti
+  :ensure (:host sourcehut :repo "ashton314/auto-olivetti")
+  :custom
+  (auto-olivetti-enabled-modes '(prog-mode text-mode fundamental-mode))
+  :config
+  (auto-olivetti-mode))
+
+;;; hl-todo: highlight TODO/FIXME/etc keywords.
+
+(use-package hl-todo
+  :ensure t
+  :custom
+  (hl-todo-keyword-faces
+   '(("TODO"   . (:inherit error :weight bold))
+     ("FIXME"  . (:inherit error :weight bold))
+     ("DEBUG"  . (:inherit warning :weight bold))
+     ("GOTCHA" . (:inherit warning :weight bold))
+     ("STUB"   . (:inherit font-lock-keyword-face :weight bold))
+     ("HACK"   . (:inherit warning :weight bold))
+     ("NOTE"   . (:inherit success :weight bold))))
+  :bind (:map hl-todo-mode-map
+              ("C-c t p" . hl-todo-previous)
+              ("C-c t n" . hl-todo-next)
+              ("C-c t o" . hl-todo-occur))
+  :config
+  (global-hl-todo-mode 1))
+
+;;; Page break lines: visual indicators for ^L characters.
+
+(use-package page-break-lines
+  :ensure t
+  :commands (page-break-lines-mode global-page-break-lines-mode)
+  :hook (emacs-lisp-mode . page-break-lines-mode))
+
+;;; Persist text scale across sessions.
+
+(use-package persist-text-scale
+  :ensure t
+  :commands (persist-text-scale-mode persist-text-scale-restore)
+  :hook (after-init . persist-text-scale-mode))
+
+;;; Modeline
+
+(setq line-number-mode t)
+(setq column-number-mode t)
+(setq mode-line-position-column-line-format '("%l:%C"))
+(add-hook 'after-init-hook #'display-time-mode)
+
+;;; Line numbers: disabled in buffers.
+
+(setq display-line-numbers-type nil)
+
+;;; Tree-sitter: maximum syntax highlighting.
+
+(setq treesit-font-lock-level 4)
+
+;;; Pixel-precise scrolling (not needed on emacs-mac which handles it natively).
+
+(unless (and (eq window-system 'mac)
+             (bound-and-true-p mac-carbon-version-string))
+  (setq pixel-scroll-precision-use-momentum nil)
+  (pixel-scroll-precision-mode 1))
+
+;;; Built-in minor modes enabled after init.
+
+(add-hook 'after-init-hook #'show-paren-mode)
+(add-hook 'after-init-hook #'delete-selection-mode)
+(add-hook 'after-init-hook #'window-divider-mode)
+(add-hook 'after-init-hook #'minibuffer-depth-indicate-mode)
+
+;;; Uniquify: disambiguate buffer names with path components.
+
+(use-package uniquify
+  :ensure nil
+  :custom
+  (uniquify-buffer-name-style 'reverse)
+  (uniquify-separator "•")
+  (uniquify-after-kill-buffer-p t))
+
+;;; Prevent accidental zoom via mouse wheel.
+
+(global-unset-key (kbd "C-<wheel-up>"))
+(global-unset-key (kbd "C-<wheel-down>"))
+
+;;; Terminal: map F12 as a Control modifier prefix.
+
+(unless (display-graphic-p)
+  (define-key key-translation-map (kbd "<f12>") 'event-apply-control-modifier))
 
 ;;; ============================================================================
 ;;; Completion (minibuffer): Vertico + Orderless + Marginalia + Consult + Embark
@@ -230,7 +376,7 @@
          ;; M-s bindings in `search-map'
          ("M-s d" . consult-find)
          ("M-s c" . consult-locate)
-         ("M-s g" . consult-grep)
+         ("M-s g" . consult-grep)1
          ("M-s G" . consult-git-grep)
          ("M-s r" . consult-ripgrep)
          ("M-s l" . consult-line)
