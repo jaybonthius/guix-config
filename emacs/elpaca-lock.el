@@ -12,6 +12,19 @@
                            "*-tests.el" "LICENSE" "README*" "*-pkg.el"))
                 :source "elpaca-menu-lock-file" :protocol https :inherit t
                 :depth treeless :ref "933d1f36cca0f71e4acb5fac707e9ae26c536264"))
+ (buffer-terminator :source "elpaca-menu-lock-file" :recipe
+                    (:package "buffer-terminator" :fetcher github :repo
+                              "jamescherti/buffer-terminator.el" :files
+                              ("*.el" "*.el.in" "dir" "*.info" "*.texi"
+                               "*.texinfo" "doc/dir" "doc/*.info" "doc/*.texi"
+                               "doc/*.texinfo" "lisp/*.el" "docs/dir"
+                               "docs/*.info" "docs/*.texi" "docs/*.texinfo"
+                               (:exclude ".dir-locals.el" "test.el" "tests.el"
+                                         "*-test.el" "*-tests.el" "LICENSE"
+                                         "README*" "*-pkg.el"))
+                              :source "elpaca-menu-lock-file" :protocol https
+                              :inherit t :depth treeless :ref
+                              "262cf10e51c0ffb26fab9edb228e6ed51650fcbe"))
  (cape :source "elpaca-menu-lock-file" :recipe
        (:package "cape" :repo "minad/cape" :fetcher github :files
                  ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo" "doc/dir"
@@ -89,6 +102,13 @@
                       :source "elpaca-menu-lock-file" :protocol https :inherit t
                       :depth treeless :ref
                       "e19593b720b9db5cf8d61d28d466da30b449b84b"))
+ (easysession :source "elpaca-menu-lock-file" :recipe
+              (:package "easysession" :fetcher github :repo
+                        "jamescherti/easysession.el" :files
+                        (:defaults "extensions/easysession*.el") :source
+                        "elpaca-menu-lock-file" :protocol https :inherit t
+                        :depth treeless :ref
+                        "bf2a989c8d990396784ae7e2a38ef9943465a967"))
  (elisp-refs :source "elpaca-menu-lock-file" :recipe
              (:package "elisp-refs" :repo "Wilfred/elisp-refs" :fetcher github
                        :files (:defaults (:exclude "elisp-refs-bench.el"))

@@ -350,11 +350,6 @@
      ("C-k" symex-climb-branch)
      ("M-i" symex-goto-lowest)
      ("M-k" symex-goto-highest)
-     ;; Fine-grained char/line movement
-     ("gj" backward-char)
-     ("gl" forward-char)
-     ("gk" symex-next-visual-line)
-     ("gi" symex-previous-visual-line)
      ;; Insertion (all exit symex modal UI)
      ("H" symex-insert-before :exit)
      ("A" symex-append-after :exit)
@@ -710,7 +705,9 @@
              magit-dispatch
              magit-file-dispatch)
   :bind (("C-x g" . magit-status)
-         ("C-x M-g" . magit-dispatch)))
+         ("C-x M-g" . magit-dispatch))
+  :custom
+  (magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1))
 
 ;; diff-hl: highlight uncommitted changes in the gutter.
 (use-package diff-hl
@@ -778,6 +775,59 @@
   (when (executable-find "rg")
     (setq dumb-jump-force-searcher 'rg)
     (setq dumb-jump-prefer-searcher 'rg)))
+
+;;; ============================================================================
+;;; Session & buffer management
+;;; ============================================================================
+
+;; easysession: persist and restore file buffers, indirect buffers/clones,
+;; Dired buffers, windows/splits, tab-bar state, and frames across sessions.
+(use-package easysession
+  :ensure t
+  :commands (easysession-switch-to
+             easysession-save-as
+             easysession-save-mode
+             easysession-load-including-geometry)
+
+  :custom
+  (easysession-mode-line-misc-info t)    ; Display session name in modeline
+  (easysession-save-interval (* 10 60))  ; Save every 10 minutes
+
+  :init
+  ;; Key mappings (C-c e prefix)
+  (global-set-key (kbd "C-c e s") #'easysession-save)
+  (global-set-key (kbd "C-c e l") #'easysession-switch-to)
+  (global-set-key (kbd "C-c e L") #'easysession-switch-to-and-restore-geometry)
+  (global-set-key (kbd "C-c e r") #'easysession-rename)
+  (global-set-key (kbd "C-c e R") #'easysession-reset)
+  (global-set-key (kbd "C-c e d") #'easysession-delete)
+
+  (if (fboundp 'easysession-setup)
+      ;; Modern: easysession-setup adds hooks for automatic session
+      ;; loading (startup or daemon), periodic saving, and save-on-exit.
+      (easysession-setup)
+    ;; Legacy fallback: depth 102/103 ensures session loads after
+    ;; minimal-emacs.d restores file-name-handler-alist at depth 101.
+    (add-hook 'emacs-startup-hook #'easysession-load-including-geometry 102)
+    (add-hook 'emacs-startup-hook #'easysession-save-mode 103)))
+
+;; easysession-scratch: persist *scratch* buffer contents across sessions.
+(use-package easysession-scratch
+  :ensure nil
+  :after easysession
+  :config
+  (easysession-scratch-mode 1))
+
+;; buffer-terminator: automatically kill inactive buffers to keep the
+;; buffer list clean and reduce resource usage.
+(use-package buffer-terminator
+  :ensure t
+  :custom
+  (buffer-terminator-verbose nil)
+  (buffer-terminator-inactivity-timeout (* 30 60)) ; 30 minutes
+  (buffer-terminator-interval (* 10 60))           ; 10 minutes
+  :config
+  (buffer-terminator-mode 1))
 
 ;;; ============================================================================
 ;;; Load custom.el
