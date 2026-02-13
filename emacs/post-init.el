@@ -135,6 +135,16 @@
 ;;; UI & appearance
 ;;; ============================================================================
 
+;; Tab bar: hide by default, use tab-bar-history for window undo/redo.
+(use-package tab-bar
+  :ensure nil
+  :bind (("C-c <left>" . tab-bar-history-back)
+         ("C-c <right>" . tab-bar-history-forward))
+  :custom
+  (tab-bar-show nil)
+  :config
+  (tab-bar-history-mode 1))
+
 ;; Default font size: 14pt (140 = 14.0pt in Emacs units).
 (set-face-attribute 'default nil :height 140)
 
