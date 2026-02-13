@@ -376,7 +376,7 @@
          ;; M-s bindings in `search-map'
          ("M-s d" . consult-find)
          ("M-s c" . consult-locate)
-         ("M-s g" . consult-grep)1
+         ("M-s g" . consult-grep)
          ("M-s G" . consult-git-grep)
          ("M-s r" . consult-ripgrep)
          ("M-s l" . consult-line)
