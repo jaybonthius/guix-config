@@ -23,6 +23,38 @@
   (compile-angel-on-load-mode 1))
 
 ;;; ============================================================================
+;;; System integration
+;;; ============================================================================
+
+;; Inherit environment variables (especially PATH) from the shell on macOS.
+;; Without this, GUI Emacs won't find tools like rg, git, node, etc.
+(use-package exec-path-from-shell
+  :ensure t
+  :defer t
+  :hook (elpaca-after-init . exec-path-from-shell-initialize))
+
+;; macOS key modifiers: Command=Control, Option=Meta, Control=Super, Fn=Hyper.
+(when (eq system-type 'darwin)
+  (setq ns-command-modifier 'control
+        ns-option-modifier 'meta
+        ns-control-modifier 'super
+        ns-function-modifier 'hyper))
+
+;; Terminal mouse support.
+(unless (display-graphic-p)
+  (xterm-mouse-mode 1))
+
+;; Ask before quitting Emacs.
+(setq confirm-kill-emacs 'y-or-n-p)
+
+;; Start the Emacs server for emacsclient usage.
+(use-package server
+  :ensure nil
+  :defer t
+  :commands server-start
+  :hook (after-init . server-start))
+
+;;; ============================================================================
 ;;; Built-in modes
 ;;; ============================================================================
 

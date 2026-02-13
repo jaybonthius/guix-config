@@ -117,6 +117,20 @@
                            "elpaca-menu-lock-file" :protocol https :inherit t
                            :depth treeless :ref
                            "7b3b2fa239c34c2e304eab4367a4f5924c047e2b"))
+ (exec-path-from-shell :source "elpaca-menu-lock-file" :recipe
+                       (:package "exec-path-from-shell" :fetcher github :repo
+                                 "purcell/exec-path-from-shell" :files
+                                 ("*.el" "*.el.in" "dir" "*.info" "*.texi"
+                                  "*.texinfo" "doc/dir" "doc/*.info"
+                                  "doc/*.texi" "doc/*.texinfo" "lisp/*.el"
+                                  "docs/dir" "docs/*.info" "docs/*.texi"
+                                  "docs/*.texinfo"
+                                  (:exclude ".dir-locals.el" "test.el"
+                                            "tests.el" "*-test.el" "*-tests.el"
+                                            "LICENSE" "README*" "*-pkg.el"))
+                                 :source "MELPA" :protocol https :inherit t
+                                 :depth treeless :ref
+                                 "7552abf032a383ff761e7d90e6b5cbb4658a728a"))
  (f :source "elpaca-menu-lock-file" :recipe
     (:package "f" :fetcher github :repo "rejeep/f.el" :files
               ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo" "doc/dir"
