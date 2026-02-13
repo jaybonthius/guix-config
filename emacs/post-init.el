@@ -379,16 +379,13 @@
     (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
 
     ;; Motion state (read-only buffers: Dired, Help, etc.)
-    (meow-motion-overwrite-define-key
+    (meow-motion-define-key
      '("i" . meow-prev)
      '("k" . meow-next)
      '("<escape>" . ignore))
 
     ;; Leader (SPC prefix)
     (meow-leader-define-key
-     ;; Pass through to original motion-state commands
-     '("i" . "H-i")
-     '("k" . "H-k")
      ;; Digit arguments
      '("1" . meow-digit-argument)
      '("2" . meow-digit-argument)
@@ -401,7 +398,15 @@
      '("9" . meow-digit-argument)
      '("0" . meow-digit-argument)
      '("/" . meow-keypad-describe-key)
-     '("?" . meow-cheatsheet))
+     '("?" . meow-cheatsheet)
+     ;; Code navigation (xref)
+     '("." . xref-find-definitions)
+     '("," . xref-go-back)
+     '("r" . xref-find-references)
+     ;; Search & replace
+     '("l" . consult-line)
+     '("s" . query-replace)
+     '("S" . query-replace-regexp))
 
     ;; Normal state (main editing)
     (meow-normal-define-key
