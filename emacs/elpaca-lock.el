@@ -128,8 +128,8 @@
                                   (:exclude ".dir-locals.el" "test.el"
                                             "tests.el" "*-test.el" "*-tests.el"
                                             "LICENSE" "README*" "*-pkg.el"))
-                                 :source "MELPA" :protocol https :inherit t
-                                 :depth treeless :ref
+                                 :source "elpaca-menu-lock-file" :protocol https
+                                 :inherit t :depth treeless :ref
                                  "7552abf032a383ff761e7d90e6b5cbb4658a728a"))
  (f :source "elpaca-menu-lock-file" :recipe
     (:package "f" :fetcher github :repo "rejeep/f.el" :files
