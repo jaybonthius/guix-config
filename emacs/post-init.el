@@ -898,6 +898,134 @@
                            (file-name-nondirectory buffer-file-name))))))
   (add-hook 'python-ts-mode-hook #'jb-python-compile-command))
 
+;;; Racket
+
+;; Helper functions defined before use-package forms so they are
+;; available immediately at init time, avoiding Elpaca's deferred
+;; evaluation race condition where hooks fire before the use-package
+;; body has been evaluated.
+
+(defun jb-insert-lisp-section (section)
+  "Insert a Lisp section header comment for SECTION at point.
+Produces a line like: ;; Foo ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;"
+  (interactive "sSection: ")
+  (let ((suffix (make-string (max 0 (- 72 (length section) 4)) ?\;)))
+    (insert (format ";; %s %s\n" section suffix))))
+
+(defun jb-racket-mode-hook ()
+  "Set up Flymake with the raco-review backend for Racket buffers."
+  (add-hook 'flymake-diagnostic-functions #'jb-flymake-racket-review nil t)
+  (flymake-mode 1))
+
+;; Register hooks immediately — these run at init time, before Elpaca
+;; processes its queue, so they're in place when racket-mode activates.
+(add-hook 'racket-mode-hook #'jb-racket-mode-hook)
+(add-hook 'racket-mode-hook #'racket-xp-mode)
+(add-hook 'racket-hash-lang-mode-hook #'racket-xp-mode)
+(add-hook 'racket-mode-hook #'rainbow-delimiters-mode)
+(add-hook 'racket-hash-lang-mode-hook #'rainbow-delimiters-mode)
+(add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode)
+
+;; rainbow-delimiters: colorize nested delimiters for visual depth cues.
+(use-package rainbow-delimiters
+  :ensure t
+  :defer t)
+
+;; Flymake backend for raco review: lint Racket source files.
+(defvar-local jb-flymake-racket-review--proc nil
+  "The running raco-review process for the current buffer, if any.")
+
+(defun jb-flymake-racket-review (report-fn &rest _args)
+  "Flymake backend that runs `raco review' on the current file.
+REPORT-FN is the Flymake callback for reporting diagnostics."
+  (unless (executable-find "raco")
+    (error "Cannot find `raco' on exec-path"))
+  (let ((source (current-buffer))
+        (filename (buffer-file-name)))
+    (when filename
+      ;; Kill any previous running process.
+      (when (process-live-p jb-flymake-racket-review--proc)
+        (kill-process jb-flymake-racket-review--proc))
+      (setq jb-flymake-racket-review--proc
+            (make-process
+             :name "flymake-racket-review"
+             :noquery t
+             :connection-type 'pipe
+             :buffer (generate-new-buffer " *flymake-racket-review*")
+             :command (list "raco" "review" filename)
+             :sentinel
+             (lambda (proc _event)
+               (when (memq (process-status proc) '(exit signal))
+                 (unwind-protect
+                     (if (with-current-buffer source
+                           (eq proc jb-flymake-racket-review--proc))
+                         (with-current-buffer (process-buffer proc)
+                           (goto-char (point-min))
+                           (let ((diags nil))
+                             (while (search-forward-regexp
+                                     "^.+?:\\([0-9]+\\):\\([0-9]+\\):\\(error\\|warning\\):\\(.*\\)$"
+                                     nil t)
+                               (let* ((line (string-to-number (match-string 1)))
+                                      (col (string-to-number (match-string 2)))
+                                      (severity (match-string 3))
+                                      (msg (string-trim (match-string 4)))
+                                      (type (if (string= severity "error") :error :warning))
+                                      (region (flymake-diag-region source line col)))
+                                 (when region
+                                   (push (flymake-make-diagnostic
+                                          source (car region) (cdr region) type msg)
+                                         diags))))
+                             ;; Non-zero exit with no diagnostics: tool error.
+                             (when (and (not diags)
+                                        (not (zerop (process-exit-status proc)))
+                                        (not (eq (process-status proc) 'signal)))
+                               (goto-char (point-min))
+                               (funcall report-fn :panic
+                                        :explanation
+                                        (buffer-substring
+                                         (point-min)
+                                         (min (point-max)
+                                              (line-end-position)))))
+                             (unless (eq (process-status proc) 'signal)
+                               (funcall report-fn diags))))
+                       (flymake-log :warning "Canceling obsolete raco review check %s" proc))
+                   (kill-buffer (process-buffer proc))))))))))
+
+;; racket-hash-lang: major mode for Racket hash-lang files (.rhm, .scrbl).
+(use-package racket-hash-lang
+  :ensure (racket-mode :host github :repo "greghendershott/racket-mode")
+  :defer t
+  :mode (("\\.rhm\\'" . racket-hash-lang-mode)
+         ("\\.scrbl\\'" . racket-hash-lang-mode))
+  :bind (:map racket-hash-lang-mode-map
+              ("C-c C-d" . racket-xp-describe)
+              ("C-c C-r" . racket-xp-rename)
+              ("C-c ."   . xref-find-definitions)
+              ("C-c ,"   . xref-go-back)))
+
+;; racket-mode: major mode for Racket source files.
+(use-package racket-mode
+  :ensure t
+  :defer t
+  :mode (("\\.rkt\\'" . racket-mode))
+  :config
+  (setq racket-repl-buffer-name-function #'racket-repl-buffer-name-project
+        racket-show-functions '(racket-show-echo-area))
+  :bind (:map racket-mode-map
+              ("C-c C-d" . racket-xp-describe)
+              ("C-c C-r" . racket-xp-rename)
+              ("C-c C-s" . jb-insert-lisp-section)
+              ("C-c r t" . racket-tidy-requires)
+              ("C-c r i" . racket-add-require-for-identifier)
+              ("C-c ."   . xref-find-definitions)
+              ("C-c ,"   . xref-go-back)))
+
+;; racket-xp-mode: cross-reference and analysis annotations.
+;; Hooks registered above via standalone add-hook calls.
+(use-package racket-xp
+  :ensure (racket-mode :host github :repo "greghendershott/racket-mode")
+  :defer t)
+
 ;;; ============================================================================
 ;;; Load custom.el
 ;;; ============================================================================

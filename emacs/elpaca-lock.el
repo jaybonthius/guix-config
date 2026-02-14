@@ -353,6 +353,27 @@
                    :source "elpaca-menu-lock-file" :protocol https :inherit t
                    :depth treeless :ref
                    "f1e2b72d773b5221d577c64c868716ef0df2de53"))
+ (racket-mode :source "elpaca-menu-lock-file" :recipe
+              (:package "racket-mode" :fetcher github :repo
+                        "greghendershott/racket-mode" :files
+                        (:defaults "*.rkt" ("racket" "racket/*")
+                                   (:exclude "racket/example/*" "racket/test/*"))
+                        :source "elpaca-menu-lock-file" :protocol https :inherit
+                        t :depth treeless :host github :ref
+                        "71f27c643dadf70847e447e773760df6df48fe5a"))
+ (rainbow-delimiters :source "elpaca-menu-lock-file" :recipe
+                     (:package "rainbow-delimiters" :fetcher github :repo
+                               "Fanael/rainbow-delimiters" :files
+                               ("*.el" "*.el.in" "dir" "*.info" "*.texi"
+                                "*.texinfo" "doc/dir" "doc/*.info" "doc/*.texi"
+                                "doc/*.texinfo" "lisp/*.el" "docs/dir"
+                                "docs/*.info" "docs/*.texi" "docs/*.texinfo"
+                                (:exclude ".dir-locals.el" "test.el" "tests.el"
+                                          "*-test.el" "*-tests.el" "LICENSE"
+                                          "README*" "*-pkg.el"))
+                               :source "elpaca-menu-lock-file" :protocol https
+                               :inherit t :depth treeless :ref
+                               "f40ece58df8b2f0fb6c8576b527755a552a5e763"))
  (repeat-ring :source "elpaca-menu-lock-file" :recipe
               (:package "repeat-ring" :fetcher github :repo
                         "countvajhula/repeat-ring" :files
