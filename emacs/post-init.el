@@ -830,6 +830,75 @@
   (buffer-terminator-mode 1))
 
 ;;; ============================================================================
+;;; Languages
+;;; ============================================================================
+
+;;; Eglot workspace configuration (global, all languages).
+;;; gopls: enable staticcheck linting and auto-complete unimported packages.
+;;; basedpyright: default settings (works well out of the box).
+
+(with-eval-after-load 'eglot
+  ;; Register basedpyright as the Python LSP server.
+  (add-to-list 'eglot-server-programs
+               '((python-mode python-ts-mode)
+                 . ("basedpyright-langserver" "--stdio")))
+
+  (setq-default eglot-workspace-configuration
+                '(:gopls (:staticcheck t
+                          :completeUnimported t))))
+
+;;; Go
+
+;; Teach project.el to find go.mod as project root so Eglot scopes
+;; the workspace correctly for Go modules.
+(with-eval-after-load 'project
+  (defun jb-project-find-go-module (dir)
+    "Find the nearest parent directory containing go.mod."
+    (when-let ((root (locate-dominating-file dir "go.mod")))
+      (cons 'go-module root)))
+
+  (cl-defmethod project-root ((project (head go-module)))
+    (cdr project))
+
+  (add-hook 'project-find-functions #'jb-project-find-go-module))
+
+;; go-ts-mode: tree-sitter based Go major mode (built-in).
+;; Hooks: eglot for LSP, format + organize imports on save.
+(use-package go-ts-mode
+  :ensure nil
+  :defer t
+  :hook ((go-ts-mode . eglot-ensure))
+  :config
+  (defun jb-go-before-save-hooks ()
+    "Set up format-on-save and organize-imports-on-save for Go."
+    (add-hook 'before-save-hook #'eglot-format-buffer -10 t)
+    (add-hook 'before-save-hook
+              (lambda ()
+                (when (eglot-managed-p)
+                  (call-interactively #'eglot-code-action-organize-imports)))
+              nil t))
+  (add-hook 'go-ts-mode-hook #'jb-go-before-save-hooks))
+
+;;; Python
+
+;; python-ts-mode: tree-sitter based Python major mode (built-in).
+;; Hooks: eglot for LSP (basedpyright), compile-command for M-x compile.
+;; No format-on-save — format manually with M-x eglot-format-buffer.
+(use-package python
+  :ensure nil
+  :defer t
+  :hook ((python-ts-mode . eglot-ensure))
+  :config
+  (defun jb-python-compile-command ()
+    "Set compile-command to run the current Python file."
+    (setq-local compile-command
+                (concat "python3 "
+                        (when buffer-file-name
+                          (shell-quote-argument
+                           (file-name-nondirectory buffer-file-name))))))
+  (add-hook 'python-ts-mode-hook #'jb-python-compile-command))
+
+;;; ============================================================================
 ;;; Load custom.el
 ;;; ============================================================================
 
