@@ -871,6 +871,7 @@
   :defer t
   :hook ((go-ts-mode . eglot-ensure))
   :config
+  (setq go-ts-mode-indent-offset tab-width)
   (defun jb-go-before-save-hooks ()
     "Set up format-on-save and organize-imports-on-save for Go."
     (add-hook 'before-save-hook #'eglot-format-buffer -10 t)
