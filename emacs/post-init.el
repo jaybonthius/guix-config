@@ -40,9 +40,18 @@
         ns-control-modifier 'super
         ns-function-modifier 'hyper))
 
-;; Terminal mouse support.
+;; Terminal support.
 (unless (display-graphic-p)
-  (xterm-mouse-mode 1))
+  (xterm-mouse-mode 1)
+
+  ;; Teach Emacs that xterm-ghostty is an xterm-compatible terminal.
+  (add-to-list 'term-file-aliases '("xterm-ghostty" . "xterm"))
+
+  ;; Ghostty (and SSH sessions from Ghostty) don't properly communicate
+  ;; background color to Emacs, causing it to assume a light background.
+  ;; Force dark background mode for correct theme colors.
+  (setq frame-background-mode 'dark)
+  (frame-set-background-mode (selected-frame)))
 
 ;; Ask before quitting Emacs.
 (setq confirm-kill-emacs 'y-or-n-p)
