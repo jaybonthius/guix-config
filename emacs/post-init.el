@@ -142,6 +142,8 @@
                     :height 140
                     :weight 'regular)
 
+(set-face-attribute 'fixed-pitch nil :family "Fira Code")
+
 (setq-default cursor-type 'bar)
 
 ;;; Tab bar: hidden, with history-based window undo/redo.
@@ -898,6 +900,39 @@
                            (file-name-nondirectory buffer-file-name))))))
   (add-hook 'python-ts-mode-hook #'jb-python-compile-command))
 
+;;; Markdown
+
+;; markdown-mode: syntax highlighting, editing commands, and preview for
+;; Markdown documents.  Also provides faces used by punct highlighting.
+(use-package markdown-mode
+  :ensure t
+  :commands (gfm-mode
+             gfm-view-mode
+             markdown-mode
+             markdown-view-mode)
+  :mode (("\\.markdown\\'" . markdown-mode)
+         ("\\.md\\'" . markdown-mode)
+         ("README\\.md\\'" . gfm-mode))
+  :bind
+  (:map markdown-mode-map
+        ("C-c C-e" . markdown-do))
+  :custom-face
+  ;; Per-level heading colors: warm→cool rainbow using twilight palette.
+  ;; Colors only (no height scaling) — works for both light and dark themes.
+  ;; Light values from twilight-bright, dark values from twilight-anti-bright.
+  (markdown-header-face-1 ((((background light)) :foreground "#d15120" :weight bold)
+                           (((background dark))  :foreground "#d15120" :weight bold)))
+  (markdown-header-face-2 ((((background light)) :foreground "#cf7900" :weight bold)
+                           (((background dark))  :foreground "#d97a35" :weight bold)))
+  (markdown-header-face-3 ((((background light)) :foreground "#d2ad00" :weight bold)
+                           (((background dark))  :foreground "#deae3e" :weight bold)))
+  (markdown-header-face-4 ((((background light)) :foreground "#5f9411" :weight bold)
+                           (((background dark))  :foreground "#81af34" :weight bold)))
+  (markdown-header-face-5 ((((background light)) :foreground "#417598" :weight bold)
+                           (((background dark))  :foreground "#7e9fc9" :weight bold)))
+  (markdown-header-face-6 ((((background light)) :foreground "#a66bab" :weight bold)
+                           (((background dark))  :foreground "#a878b5" :weight bold))))
+
 ;;; Racket
 
 ;; Helper functions defined before use-package forms so they are
@@ -925,6 +960,188 @@ Produces a line like: ;; Foo ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;"
 (add-hook 'racket-mode-hook #'rainbow-delimiters-mode)
 (add-hook 'racket-hash-lang-mode-hook #'rainbow-delimiters-mode)
 (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode)
+
+;; Punct (.punct) markdown highlighting for racket-hash-lang-mode.
+;;
+;; Punct files are CommonMark markdown with inline Racket via #lang punct.
+;; racket-hash-lang-mode provides Racket back-end integration but its
+;; color-lexer treats prose as undifferentiated text.  We layer markdown
+;; font-lock keywords on top so headings, bold, italic, links, etc. are
+;; visually highlighted while keeping full Racket tooling.
+;;
+;; This works because racket-hash-lang-mode explicitly supports
+;; font-lock-add-keywords: it applies back-end token faces first (setting
+;; syntax-table properties for comments/strings), then runs
+;; font-lock-fontify-keywords-region for any added keyword rules.
+
+(defvar jb-punct-markdown-keywords
+  '(;; YAML front matter: --- delimiters and key: value pairs
+    ("^---$" 0 'markdown-markup-face prepend)
+    ("^\\([[:alpha:]][[:alnum:]_-]*\\):\\s-+\\(.*\\)$"
+     (1 'markdown-metadata-key-face prepend)
+     (2 'markdown-metadata-value-face prepend))
+
+    ;; ATX headings: # through ######
+    ;; Ordered long-to-short so ###### matches before #.
+    ("^\\(######\\)\\s-+\\(.*\\)$"
+     (1 'markdown-header-delimiter-face prepend)
+     (2 'markdown-header-face-6 prepend))
+    ("^\\(#####\\)\\s-+\\(.*\\)$"
+     (1 'markdown-header-delimiter-face prepend)
+     (2 'markdown-header-face-5 prepend))
+    ("^\\(####\\)\\s-+\\(.*\\)$"
+     (1 'markdown-header-delimiter-face prepend)
+     (2 'markdown-header-face-4 prepend))
+    ("^\\(###\\)\\s-+\\(.*\\)$"
+     (1 'markdown-header-delimiter-face prepend)
+     (2 'markdown-header-face-3 prepend))
+    ("^\\(##\\)\\s-+\\(.*\\)$"
+     (1 'markdown-header-delimiter-face prepend)
+     (2 'markdown-header-face-2 prepend))
+    ("^\\(#\\)\\s-+\\(.*\\)$"
+     (1 'markdown-header-delimiter-face prepend)
+     (2 'markdown-header-face-1 prepend))
+
+    ;; Horizontal rules: three or more -, *, or _ (possibly spaced)
+    ("^\\s-*\\([-*_]\\s-*\\)\\{3,\\}$" 0 'markdown-hr-face prepend)
+
+    ;; Blockquotes: > at start of line
+    ("^\\s-*\\(>\\)\\s-?\\(.*\\)$"
+     (1 'markdown-markup-face prepend)
+     (2 'markdown-blockquote-face prepend))
+
+    ;; Unordered list markers: -, *, + at start of line
+    ("^\\s-*\\([-*+]\\)\\s-+" 1 'markdown-list-face prepend)
+    ;; Ordered list markers: 1. 2. etc.
+    ("^\\s-*\\([0-9]+\\.\\)\\s-+" 1 'markdown-list-face prepend)
+
+    ;; Fenced code block delimiters: ``` or ~~~
+    ;; Captures optional language identifier separately.
+    ("^\\s-*\\(```\\|~~~\\)\\([[:alpha:]][[:alnum:]_+-]*\\)?\\s-*$"
+     (1 'markdown-markup-face prepend)
+     (2 'markdown-language-keyword-face prepend t))
+
+    ;; Inline code: `code`
+    ("\\(`\\)\\([^`\n]+?\\)\\(`\\)"
+     (1 'markdown-markup-face prepend)
+     (2 'markdown-inline-code-face prepend)
+     (3 'markdown-markup-face prepend))
+
+    ;; Bold: **text** or __text__
+    ("\\(\\*\\*\\)\\([^*\n]+?\\)\\(\\*\\*\\)"
+     (1 'markdown-markup-face prepend)
+     (2 'markdown-bold-face prepend)
+     (3 'markdown-markup-face prepend))
+    ("\\(__\\)\\([^_\n]+?\\)\\(__\\)"
+     (1 'markdown-markup-face prepend)
+     (2 'markdown-bold-face prepend)
+     (3 'markdown-markup-face prepend))
+
+    ;; Italic: *text* or _text_ (but not ** or __)
+    ("\\(?:^\\|[^*]\\)\\(\\*\\)\\([^*\n]+?\\)\\(\\*\\)\\(?:[^*]\\|$\\)"
+     (1 'markdown-markup-face prepend)
+     (2 'markdown-italic-face prepend)
+     (3 'markdown-markup-face prepend))
+    ("\\(?:^\\|[^_]\\)\\(_\\)\\([^_\n]+?\\)\\(_\\)\\(?:[^_]\\|$\\)"
+     (1 'markdown-markup-face prepend)
+     (2 'markdown-italic-face prepend)
+     (3 'markdown-markup-face prepend))
+
+    ;; Strikethrough: ~~text~~
+    ("\\(~~\\)\\([^~\n]+?\\)\\(~~\\)"
+     (1 'markdown-markup-face prepend)
+     (2 'markdown-strike-through-face prepend)
+     (3 'markdown-markup-face prepend))
+
+    ;; Links: [text](url) with optional "title"
+    ("\\(\\[\\)\\([^]\n]*\\)\\(\\]\\)(\\([^)\" \t\n]*\\)\\(?:\\s-+\"\\([^\"]*\\)\"\\)?)"
+     (1 'markdown-markup-face prepend)
+     (2 'markdown-link-face prepend)
+     (3 'markdown-markup-face prepend)
+     (4 'markdown-url-face prepend)
+     (5 'markdown-link-title-face prepend t))
+
+    ;; Images: ![alt](url) with optional "title"
+    ("\\(!\\[\\)\\([^]\n]*\\)\\(\\]\\)(\\([^)\" \t\n]*\\)\\(?:\\s-+\"\\([^\"]*\\)\"\\)?)"
+     (1 'markdown-markup-face prepend)
+     (2 'markdown-link-face prepend)
+     (3 'markdown-markup-face prepend)
+     (4 'markdown-url-face prepend)
+     (5 'markdown-link-title-face prepend t))
+
+    ;; Reference links: [text][ref]
+    ("\\(\\[\\)\\([^]\n]*\\)\\(\\]\\)\\(\\[\\)\\([^]\n]*\\)\\(\\]\\)"
+     (1 'markdown-markup-face prepend)
+     (2 'markdown-link-face prepend)
+     (3 'markdown-markup-face prepend)
+     (4 'markdown-markup-face prepend)
+     (5 'markdown-reference-face prepend)
+     (6 'markdown-markup-face prepend))
+
+    ;; Reference definitions: [ref]: url "title"
+    ("^\\s-*\\(\\[\\)\\([^]\n]+\\)\\(\\]\\):\\s-+\\(\\S-+\\)\\(?:\\s-+\"\\([^\"]*\\)\"\\)?$"
+     (1 'markdown-markup-face prepend)
+     (2 'markdown-reference-face prepend)
+     (3 'markdown-markup-face prepend)
+     (4 'markdown-url-face prepend)
+     (5 'markdown-link-title-face prepend t))
+
+    ;; Footnote markers: [^label]
+    ("\\(\\[\\^\\)\\([^]\n]+\\)\\(\\]\\)"
+     (1 'markdown-markup-face prepend)
+     (2 'markdown-footnote-marker-face prepend)
+     (3 'markdown-markup-face prepend))
+
+    ;; GFM tables: lines with | delimiters
+    ("^\\s-*|.*|\\s-*$" 0 'markdown-table-face prepend)
+
+    ;; HTML comments: <!-- ... -->
+    ("\\(<!--\\)\\(\\(?:.\\|\n\\)*?\\)\\(-->\\)"
+     (1 'markdown-markup-face prepend)
+     (2 'markdown-comment-face prepend)
+     (3 'markdown-markup-face prepend))
+
+    ;; Angle-bracket URLs: <http://...>
+    ("\\(<\\)\\(https?://[^>\n]+\\)\\(>\\)"
+     (1 'markdown-markup-face prepend)
+     (2 'markdown-plain-url-face prepend)
+     (3 'markdown-markup-face prepend))
+
+    ;; Backslash escapes: \* \[ \] etc.
+    ("\\(\\\\\\)[\\\\`*_{}\\[\\]()#+.!~|>-]"
+     1 'markdown-markup-face prepend)
+
+    ;; Task list checkboxes: - [ ] or - [x] or - [X]
+    ("^\\s-*[-*+]\\s-+\\(\\[[ xX]\\]\\)"
+     1 'markdown-gfm-checkbox-face prepend)
+
+    ;; Punct inline Racket: •(...) — highlight the bullet marker
+    ("\\(•\\)" 1 'markdown-markup-face prepend))
+  "Font-lock keywords for CommonMark constructs in Punct files.
+Uses `prepend' so markdown faces override the back-end's `text' token
+face while respecting syntax-table properties that prevent matches
+inside comments and strings.")
+
+(defun jb-punct-hash-lang-hook (module-language)
+  "Add or remove markdown font-lock keywords based on MODULE-LANGUAGE.
+When the hash-lang is punct, layer CommonMark highlighting on top of
+racket-hash-lang-mode's token-based fontification."
+  (if (or (and (stringp module-language)
+               (string-match-p "punct" module-language))
+          ;; Fallback: detect via buffer file extension when the lang
+          ;; doesn't supply module-language info.
+          (and (null module-language)
+               buffer-file-name
+               (string-match-p "\\.punct\\'" buffer-file-name)))
+      (progn
+        (require 'markdown-mode)
+        (font-lock-add-keywords nil jb-punct-markdown-keywords 'append)
+        (font-lock-flush))
+    ;; Non-punct lang: remove markdown keywords if present.
+    (font-lock-remove-keywords nil jb-punct-markdown-keywords)
+    (font-lock-flush)))
+
+(add-hook 'racket-hash-lang-module-language-hook #'jb-punct-hash-lang-hook)
 
 ;; rainbow-delimiters: colorize nested delimiters for visual depth cues.
 (use-package rainbow-delimiters
@@ -991,12 +1208,13 @@ REPORT-FN is the Flymake callback for reporting diagnostics."
                        (flymake-log :warning "Canceling obsolete raco review check %s" proc))
                    (kill-buffer (process-buffer proc))))))))))
 
-;; racket-hash-lang: major mode for Racket hash-lang files (.rhm, .scrbl).
+;; racket-hash-lang: major mode for Racket hash-lang files (.rhm, .scrbl, .punct).
 (use-package racket-hash-lang
   :ensure (racket-mode :host github :repo "greghendershott/racket-mode")
   :defer t
   :mode (("\\.rhm\\'" . racket-hash-lang-mode)
-         ("\\.scrbl\\'" . racket-hash-lang-mode))
+         ("\\.scrbl\\'" . racket-hash-lang-mode)
+         ("\\.punct\\'" . racket-hash-lang-mode))
   :bind (:map racket-hash-lang-mode-map
               ("C-c C-d" . racket-xp-describe)
               ("C-c C-r" . racket-xp-rename)

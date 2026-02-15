@@ -258,6 +258,19 @@
                        :source "elpaca-menu-lock-file" :protocol https :inherit
                        t :depth treeless :ref
                        "0d08fbea0f1182627891240780081ba528c1348b"))
+ (markdown-mode :source "elpaca-menu-lock-file" :recipe
+                (:package "markdown-mode" :fetcher github :repo
+                          "jrblevin/markdown-mode" :files
+                          ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo"
+                           "doc/dir" "doc/*.info" "doc/*.texi" "doc/*.texinfo"
+                           "lisp/*.el" "docs/dir" "docs/*.info" "docs/*.texi"
+                           "docs/*.texinfo"
+                           (:exclude ".dir-locals.el" "test.el" "tests.el"
+                                     "*-test.el" "*-tests.el" "LICENSE"
+                                     "README*" "*-pkg.el"))
+                          :source "elpaca-menu-lock-file" :protocol https
+                          :inherit t :depth treeless :ref
+                          "9de2df5a9f2f864c82ec112d3369154767a2bb49"))
  (meow :source "elpaca-menu-lock-file" :recipe
        (:package "meow" :repo "meow-edit/meow" :fetcher github :files
                  ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo" "doc/dir"
