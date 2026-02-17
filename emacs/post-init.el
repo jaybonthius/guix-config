@@ -735,7 +735,67 @@
   (setq diff-hl-flydiff-delay 0.4)
   (setq diff-hl-show-staged-changes nil)
   (setq diff-hl-update-async t)
-  (setq diff-hl-global-modes '(not pdf-view-mode image-mode)))
+  (setq diff-hl-global-modes '(not pdf-view-mode image-mode))
+  :config
+  ;; Custom highlight function that right-aligns the indicator within
+  ;; the window margin so it appears adjacent to the text, even when
+  ;; olivetti has set wide margins for centering.
+  (defun my/diff-hl-highlight-inline (ovl type _shape)
+    "Show diff-hl indicator right-aligned in the left margin."
+    (let* ((face (intern (format "diff-hl-%s" type)))
+           (sym (pcase type
+                  ('insert  "+")
+                  ('delete  "-")
+                  ('change  "~")
+                  (_        "?")))
+           (win (or (get-buffer-window (overlay-buffer ovl)) (selected-window)))
+           (margin-width (or (car (window-margins win)) 0)))
+      ;; Ensure at least 2 columns of left margin (indicator + gap).
+      (when (< margin-width 2)
+        (setq margin-width 2)
+        (set-window-margins win 2 (cdr (window-margins win))))
+      (let* ((padding (propertize (make-string (max 0 (- margin-width 2)) ?\s)
+                                  'face 'default))
+             (spacer (propertize " " 'face 'default))
+             (indicator (propertize sym 'face face))
+             (str (propertize " " 'display
+                              `((margin left-margin)
+                                ,(concat padding indicator spacer))
+                              'face 'default)))
+        (overlay-put ovl 'before-string str))))
+
+  (setq diff-hl-highlight-function #'my/diff-hl-highlight-inline)
+  (setq diff-hl-highlight-reference-function #'my/diff-hl-highlight-inline)
+
+  ;; When diff-hl-mode starts, ensure the buffer has at least a
+  ;; 2-column left margin (indicator + gap).
+  (add-hook 'diff-hl-mode-on-hook
+            (lambda ()
+              (setq-local left-margin-width (max left-margin-width 2))
+              (when-let ((win (get-buffer-window)))
+                (set-window-margins win (max (or (car (window-margins win)) 0) 2)
+                                   (cdr (window-margins win))))))
+
+  ;; When olivetti is toggled off it resets margins to nil, which
+  ;; destroys the margin area diff-hl renders into.  Restore the
+  ;; margin and refresh diff-hl indicators after olivetti resets.
+  (defun my/diff-hl-after-olivetti-reset (window)
+    "Restore left margin for diff-hl after olivetti is disabled."
+    (when (and (window-live-p window)
+               (not (buffer-local-value 'olivetti-mode (window-buffer window)))
+               (buffer-local-value 'diff-hl-mode (window-buffer window)))
+      (set-window-margins window 2 (cdr (window-margins window)))
+      (with-current-buffer (window-buffer window)
+        (diff-hl-update))))
+  (advice-add 'olivetti-reset-window :after #'my/diff-hl-after-olivetti-reset)
+
+  ;; When olivetti turns on, it sets wide margins but diff-hl overlays
+  ;; still have the old (narrow) padding.  Refresh after olivetti
+  ;; finishes setting up.
+  (add-hook 'olivetti-mode-hook
+            (lambda ()
+              (when (and olivetti-mode (bound-and-true-p diff-hl-mode))
+                (diff-hl-update)))))
 
 ;;; ============================================================================
 ;;; Snippets
