@@ -847,7 +847,8 @@
 
   (setq-default eglot-workspace-configuration
                 '(:gopls (:staticcheck t
-                          :completeUnimported t))))
+                          :completeUnimported t)
+                  :basedpyright.analysis (:typeCheckingMode "basic"))))
 
 ;;; Go
 
