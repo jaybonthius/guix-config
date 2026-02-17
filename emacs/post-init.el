@@ -33,12 +33,21 @@
   :defer t
   :hook (elpaca-after-init . exec-path-from-shell-initialize))
 
-;; macOS key modifiers: Command=Control, Option=Meta, Control=Super, Fn=Hyper.
+;; macOS key modifiers: Control=Control, Option=Meta, Command=Super, Fn=Hyper.
 (when (eq system-type 'darwin)
-  (setq ns-command-modifier 'control
+  (setq ns-command-modifier 'super
         ns-option-modifier 'meta
-        ns-control-modifier 'super
+        ns-control-modifier 'control
         ns-function-modifier 'hyper))
+
+;; kkp: Kitty Keyboard Protocol support for terminal Emacs
+(use-package kkp
+  :ensure t
+  :custom
+  (kkp-super-modifier 'super)
+  (kkp-control-modifier 'control)
+  :config
+  (global-kkp-mode 1))
 
 ;; Terminal mouse support.
 (unless (display-graphic-p)
