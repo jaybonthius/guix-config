@@ -483,7 +483,24 @@
      '("<escape>" . ignore)))
 
   (meow-setup)
-  (meow-global-mode 1))
+  (setq meow-cursor-type-default '(bar . 2))
+  (meow-global-mode 1)
+
+  ;; s-m: toggle meow on/off in the current buffer.
+  ;; When toggled on, forces normal state (full keymap) so the underlying
+  ;; mode's bindings are completely suppressed.
+  (defun meow-toggle ()
+    "Toggle meow-mode in the current buffer.
+When enabling, always enter normal state so that meow's full keymap
+takes priority and the underlying mode's keys are suppressed."
+    (interactive)
+    (if meow-mode
+        (progn
+          (meow-mode -1)
+          (meow--set-cursor-type '(bar . 2)))
+      (meow-mode 1)
+      (meow--switch-state 'normal)))
+  (global-set-key (kbd "s-m") #'meow-toggle))
 
 ;;; ============================================================================
 ;;; Completion (minibuffer): Vertico + Orderless + Marginalia + Consult + Embark
@@ -723,7 +740,11 @@
   :bind (("C-x g" . magit-status)
          ("C-x M-g" . magit-dispatch))
   :custom
-  (magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1))
+  (magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
+  :config
+  ;; Disable meow by default in magit buffers so all magit keys work
+  ;; natively.  Press s-m to toggle meow on for IJKL movement.
+  (add-hook 'magit-mode-hook (lambda () (meow-mode -1))))
 
 ;; diff-hl: highlight uncommitted changes in the gutter.
 (use-package diff-hl
