@@ -411,6 +411,7 @@
      '("r" . xref-find-references)
      ;; Search & replace
      '("l" . consult-line)
+     '(";" . avy-goto-char-timer)
      '("s" . query-replace)
      '("S" . query-replace-regexp))
 
@@ -694,10 +695,14 @@
 ;; Avy: jump to visible text with minimal keystrokes.
 (use-package avy
   :ensure t
-  :commands (avy-goto-char
+  :commands (avy-gotochar
              avy-goto-char-2
-             avy-next)
-  :bind ("C-'" . avy-goto-char-2))
+             avy-next))
+
+(use-package casual-avy
+  :ensure t
+  :after avy
+  :bind ("s-k" . casual-avy-tmenu))
 
 ;;; ============================================================================
 ;;; Git
@@ -764,7 +769,7 @@
 (use-package treesit-auto
   :ensure t
   :custom
-  (treesit-auto-install 'prompt)
+  (treesit-auto-install t)
   :config
   (treesit-auto-add-to-auto-mode-alist 'all)
   (global-treesit-auto-mode))
@@ -854,6 +859,10 @@
                '((python-mode python-ts-mode)
                  . ("basedpyright-langserver" "--stdio")))
 
+  ;; Register terraform-ls as the LSP server for terraform-mode.
+  (add-to-list 'eglot-server-programs
+               '(terraform-mode . ("terraform-ls" "serve")))
+
   (setq-default eglot-workspace-configuration
                 '(:gopls (:staticcheck t
                           :completeUnimported t)
@@ -910,6 +919,36 @@
                           (shell-quote-argument
                            (file-name-nondirectory buffer-file-name))))))
   (add-hook 'python-ts-mode-hook #'jb-python-compile-command))
+
+;;; JSON
+
+;; json-ts-mode: tree-sitter based JSON major mode (built-in).
+;; treesit-auto handles auto-mode-alist and grammar installation.
+;; Eglot has built-in server registration for vscode-json-language-server.
+(use-package json-ts-mode
+  :ensure nil
+  :defer t
+  :hook ((json-ts-mode . eglot-ensure))
+  :custom
+  (json-ts-mode-indent-offset 2))
+
+;;; Terraform
+
+;; terraform-mode: major mode for Terraform/HCL configuration files.
+;; Provides syntax highlighting, indentation, and imenu.
+;; hcl-mode is pulled in automatically as a dependency.
+(use-package terraform-mode
+  :ensure t
+  :defer t
+  :hook ((terraform-mode . eglot-ensure))
+  :custom
+  (terraform-indent-level 2)
+  (terraform-format-on-save nil)
+  :config
+  (defun jb-terraform-before-save-hooks ()
+    "Set up format-on-save for Terraform via eglot (terraform-ls)."
+    (add-hook 'before-save-hook #'eglot-format-buffer -10 t))
+  (add-hook 'terraform-mode-hook #'jb-terraform-before-save-hooks))
 
 ;;; Markdown
 
