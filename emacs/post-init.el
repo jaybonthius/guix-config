@@ -416,9 +416,12 @@
      '("r" . xref-find-references)
      ;; Search & replace
      '("l" . consult-line)
-     '(";" . avy-goto-char-timer)
+     '(";" . flash-jump)
+     '("t" . uflash-treesitter)
      '("s" . query-replace)
-     '("S" . query-replace-regexp))
+     '("S" . query-replace-regexp)
+     '("r" . consult-ripgrep)
+     '("p" . easysession-switch-to-previous))
 
     ;; Normal state (main editing)
     (meow-normal-define-key
@@ -913,13 +916,70 @@ takes priority and the underlying mode's keys are suppressed."
   (easysession-save-interval (* 10 60))  ; Save every 10 minutes
 
   :init
+  ;; Track previous session for quick toggling
+  (defvar easysession-previous-session nil
+    "Name of the previously visited easysession.")
+
+  (defun easysession-switch-to-previous ()
+    "Switch to the previous easysession."
+    (interactive)
+    (if easysession-previous-session
+        (easysession-switch-to easysession-previous-session)
+      (user-error "No previous session")))
+
+  (define-advice easysession-switch-to (:before (&rest _) track-previous)
+    "Stash current session name before switching."
+    (when (bound-and-true-p easysession--current-session-name)
+      (setq easysession-previous-session easysession--current-session-name)))
+
+  (defun jb-project-session-switch ()
+    "Pick a project and switch to an easysession named after it.
+Prompts with the known project list, derives a session name from
+the project, then either creates a new session or switches to an
+existing one.  When a session with that name already exists, the
+user is asked whether to switch to it or create a new session
+with an additional suffix.  New sessions automatically open
+`project-find-file' in the selected project."
+    (interactive)
+    (let* ((dir (project-prompt-project-dir))
+           (pr (project-current nil dir))
+           (name (if pr
+                     (project-name pr)
+                   (file-name-nondirectory (directory-file-name dir))))
+           (session-exists (file-exists-p
+                            (easysession-get-session-file-path name))))
+      ;; Remember the project so it stays in the known list.
+      (when pr (project-remember-project pr))
+      (let ((easysession-confirm-new-session nil))
+        (if (not session-exists)
+            ;; No session yet -- create one silently and open a file.
+            (progn
+              (easysession-switch-to name)
+              (let ((default-directory dir))
+                (project-find-file)))
+          ;; Session exists -- ask the user what to do.
+          (pcase (completing-read
+                  (format "Session \"%s\" exists: " name)
+                  '("Switch to existing" "Create new with suffix")
+                  nil t)
+            ("Switch to existing"
+             (easysession-switch-to name))
+            ("Create new with suffix"
+             (let* ((suffix (read-string "Suffix: "))
+                    (new-name (concat name "-" suffix)))
+               (easysession-switch-to new-name)
+               (let ((default-directory dir))
+                 (project-find-file)))))))))
+
   ;; Key mappings (C-c e prefix)
   (global-set-key (kbd "C-c e s") #'easysession-save)
   (global-set-key (kbd "C-c e l") #'easysession-switch-to)
   (global-set-key (kbd "C-c e L") #'easysession-switch-to-and-restore-geometry)
+  (global-set-key (kbd "C-c e p") #'easysession-switch-to-previous)
   (global-set-key (kbd "C-c e r") #'easysession-rename)
   (global-set-key (kbd "C-c e R") #'easysession-reset)
   (global-set-key (kbd "C-c e d") #'easysession-delete)
+  (global-set-key (kbd "C-c e P") #'jb-project-session-switch)
 
   (if (fboundp 'easysession-setup)
       ;; Modern: easysession-setup adds hooks for automatic session
