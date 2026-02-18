@@ -726,6 +726,23 @@ takes priority and the underlying mode's keys are suppressed."
   :after avy
   :bind ("s-k" . casual-avy-tmenu))
 
+;; Flash: incremental search-based navigation with jump labels.
+;; Unlike avy's fixed-length input, flash lets you type an arbitrary
+;; search pattern and shows labels alongside results as you type.
+(use-package flash
+  :ensure (:host github :repo "Prgebish/flash")
+  :commands (flash-jump flash-jump-continue flash-treesitter)
+  :custom
+  (flash-multi-window t)
+  (flash-backdrop t)
+  (flash-rainbow t)
+  (flash-nohlsearch t)
+  (flash-search-history t)
+  (flash-label-position 'overlay)
+  :config
+  (require 'flash-isearch)
+  (flash-isearch-mode 1))
+
 ;;; ============================================================================
 ;;; Git
 ;;; ============================================================================
