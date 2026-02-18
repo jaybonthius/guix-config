@@ -142,7 +142,7 @@
 (setq auto-save-timeout 30)
 
 ;; auto-save-visited-mode: save file-visiting buffers after idle time.
-(setq auto-save-visited-interval 5)
+
 (auto-save-visited-mode 1)
 
 ;;; ============================================================================
