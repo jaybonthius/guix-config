@@ -2,8 +2,8 @@
 
 ;;; Code:
 
-;; Enable debug on error during development.
-(setq debug-on-error t)
+;; Only enable the debugger when Emacs is started with --debug-init.
+(setq debug-on-error init-file-debug)
 
 ;; Disable package.el initialization since Elpaca replaces it.
 (setq minimal-emacs-package-initialize-and-refresh nil)
