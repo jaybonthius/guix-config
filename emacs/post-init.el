@@ -40,10 +40,15 @@
         ns-control-modifier 'control
         ns-function-modifier 'hyper))
 
-;; kkp: Kitty Keyboard Protocol support for terminal Emacs
+;; kkp: Kitty Keyboard Protocol support for terminal Emacs.
+;; The default query timeout (0.1s) is too short for SSH sessions and
+;; can cause KKP negotiation to silently fail.  When that happens,
+;; modifyOtherKeys CSI-u sequences arrive but nothing decodes them,
+;; producing "u is undefined" errors on Ctrl+Shift combos.
 (use-package kkp
   :ensure t
   :custom
+  (kkp-terminal-query-timeout 0.5)
   (kkp-super-modifier 'super)
   (kkp-control-modifier 'control)
   :config
