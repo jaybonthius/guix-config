@@ -54,6 +54,11 @@
   :config
   (global-kkp-mode 1))
 
+;; clipetty: send kills to the system clipboard over SSH/tmux via OSC 52.
+(use-package clipetty
+  :ensure t
+  :bind ("M-w" . clipetty-kill-ring-save))
+
 ;; Terminal mouse support.
 (unless (display-graphic-p)
   (xterm-mouse-mode 1))
@@ -484,7 +489,7 @@
      '("W" . meow-mark-symbol)
      '("x" . meow-line)
      '("X" . meow-goto-line)
-     '("y" . meow-save)
+     '("y" . clipetty-kill-ring-save)
      '("Y" . meow-sync-grab)
      '("z" . meow-pop-selection)
      '("'" . repeat)

@@ -57,6 +57,17 @@
                        :source "elpaca-menu-lock-file" :protocol https :inherit
                        t :depth treeless :ref
                        "c5bc8e9d57a843f75e6125f097550414af3d5ec7"))
+ (clipetty :source "elpaca-menu-lock-file" :recipe
+           (:package "clipetty" :repo "spudlyo/clipetty" :fetcher github :files
+                     ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo"
+                      "doc/dir" "doc/*.info" "doc/*.texi" "doc/*.texinfo"
+                      "lisp/*.el" "docs/dir" "docs/*.info" "docs/*.texi"
+                      "docs/*.texinfo"
+                      (:exclude ".dir-locals.el" "test.el" "tests.el"
+                                "*-test.el" "*-tests.el" "LICENSE" "README*"
+                                "*-pkg.el"))
+                     :source "MELPA" :protocol https :inherit t :depth treeless
+                     :ref "01b39044b9b65fa4ea7d3166f8b1ffab6f740362"))
  (compile-angel :source "elpaca-menu-lock-file" :recipe
                 (:package "compile-angel" :fetcher github :repo
                           "jamescherti/compile-angel.el" :files
