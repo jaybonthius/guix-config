@@ -912,7 +912,6 @@ takes priority and the underlying mode's keys are suppressed."
 (use-package easysession
   :ensure t
   :commands (easysession-switch-to
-             easysession-save-as
              easysession-save-mode
              easysession-load-including-geometry)
 
@@ -938,12 +937,9 @@ takes priority and the underlying mode's keys are suppressed."
       (setq easysession-previous-session easysession--current-session-name)))
 
   (defun jb-project-session-switch ()
-    "Pick a project and switch to an easysession named after it.
-Prompts with the known project list, derives a session name from
-the project, then either creates a new session or switches to an
-existing one.  When a session with that name already exists, the
-user is asked whether to switch to it or create a new session
-with an additional suffix.  New sessions automatically open
+    "Pick a project and switch to its easysession.
+Derives a session name from the project.  If the session already
+exists, switches to it.  Otherwise creates a new session and opens
 `project-find-file' in the selected project."
     (interactive)
     (let* ((dir (project-prompt-project-dir))
@@ -953,28 +949,12 @@ with an additional suffix.  New sessions automatically open
                    (file-name-nondirectory (directory-file-name dir))))
            (session-exists (file-exists-p
                             (easysession-get-session-file-path name))))
-      ;; Remember the project so it stays in the known list.
       (when pr (project-remember-project pr))
       (let ((easysession-confirm-new-session nil))
-        (if (not session-exists)
-            ;; No session yet -- create one silently and open a file.
-            (progn
-              (easysession-switch-to name)
-              (let ((default-directory dir))
-                (project-find-file)))
-          ;; Session exists -- ask the user what to do.
-          (pcase (completing-read
-                  (format "Session \"%s\" exists: " name)
-                  '("Switch to existing" "Create new with suffix")
-                  nil t)
-            ("Switch to existing"
-             (easysession-switch-to name))
-            ("Create new with suffix"
-             (let* ((suffix (read-string "Suffix: "))
-                    (new-name (concat name "-" suffix)))
-               (easysession-switch-to new-name)
-               (let ((default-directory dir))
-                 (project-find-file)))))))))
+        (easysession-switch-to name)
+        (unless session-exists
+          (let ((default-directory dir))
+            (project-find-file))))))
 
   ;; Key mappings (C-c e prefix)
   (global-set-key (kbd "C-c e s") #'easysession-save)
@@ -986,14 +966,7 @@ with an additional suffix.  New sessions automatically open
   (global-set-key (kbd "C-c e d") #'easysession-delete)
   (global-set-key (kbd "C-c e P") #'jb-project-session-switch)
 
-  (if (fboundp 'easysession-setup)
-      ;; Modern: easysession-setup adds hooks for automatic session
-      ;; loading (startup or daemon), periodic saving, and save-on-exit.
-      (easysession-setup)
-    ;; Legacy fallback: depth 102/103 ensures session loads after
-    ;; minimal-emacs.d restores file-name-handler-alist at depth 101.
-    (add-hook 'emacs-startup-hook #'easysession-load-including-geometry 102)
-    (add-hook 'emacs-startup-hook #'easysession-save-mode 103)))
+  (easysession-setup))
 
 ;; easysession-scratch: persist *scratch* buffer contents across sessions.
 (use-package easysession-scratch
