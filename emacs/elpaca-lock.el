@@ -66,8 +66,9 @@
                       (:exclude ".dir-locals.el" "test.el" "tests.el"
                                 "*-test.el" "*-tests.el" "LICENSE" "README*"
                                 "*-pkg.el"))
-                     :source "MELPA" :protocol https :inherit t :depth treeless
-                     :ref "01b39044b9b65fa4ea7d3166f8b1ffab6f740362"))
+                     :source "elpaca-menu-lock-file" :protocol https :inherit t
+                     :depth treeless :ref
+                     "01b39044b9b65fa4ea7d3166f8b1ffab6f740362"))
  (compile-angel :source "elpaca-menu-lock-file" :recipe
                 (:package "compile-angel" :fetcher github :repo
                           "jamescherti/compile-angel.el" :files
