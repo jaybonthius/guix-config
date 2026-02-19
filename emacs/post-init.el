@@ -907,6 +907,28 @@ takes priority and the underlying mode's keys are suppressed."
 ;;; Session & buffer management
 ;;; ============================================================================
 
+;; EMACS_PROJECT_DIR: open Emacs directly into a project session.
+;; Must live at top level (outside use-package/elpaca forms) so the
+;; hook is registered during init-file evaluation, before elpaca's
+;; async queue processing.  The elpaca-after-init-hook fires after all
+;; packages (including easysession) are loaded and activated.
+(when-let ((dir (getenv "EMACS_PROJECT_DIR")))
+  (setq dir (file-name-as-directory (expand-file-name dir)))
+  (add-hook
+   'elpaca-after-init-hook
+   (let ((project-dir dir))
+     (lambda ()
+       (let* ((pr (or (project-current nil project-dir)
+                      (cons 'transient project-dir)))
+              (root (project-root pr))
+              (name (project-name pr)))
+         (project-remember-project pr)
+         (let ((easysession-confirm-new-session nil))
+           (easysession-switch-to name))
+         (setq default-directory root)
+         (easysession-save))))
+   95))
+
 ;; easysession: persist and restore file buffers, indirect buffers/clones,
 ;; Dired buffers, windows/splits, tab-bar state, and frames across sessions.
 (use-package easysession
@@ -936,6 +958,15 @@ takes priority and the underlying mode's keys are suppressed."
     (when (bound-and-true-p easysession--current-session-name)
       (setq easysession-previous-session easysession--current-session-name)))
 
+  (defun jb--ensure-project (dir)
+    "Return a project for DIR, creating a transient one if needed.
+Ensures the project is registered in the known-project list."
+    (setq dir (file-name-as-directory (expand-file-name dir)))
+    (let ((pr (or (project-current nil dir)
+                  (cons 'transient dir))))
+      (project-remember-project pr)
+      pr))
+
   (defun jb-project-session-switch ()
     "Pick a project and switch to its easysession.
 Derives a session name from the project.  If the session already
@@ -943,17 +974,14 @@ exists, switches to it.  Otherwise creates a new session and opens
 `project-find-file' in the selected project."
     (interactive)
     (let* ((dir (project-prompt-project-dir))
-           (pr (project-current nil dir))
-           (name (if pr
-                     (project-name pr)
-                   (file-name-nondirectory (directory-file-name dir))))
+           (pr (jb--ensure-project dir))
+           (name (project-name pr))
            (session-exists (file-exists-p
                             (easysession-get-session-file-path name))))
-      (when pr (project-remember-project pr))
       (let ((easysession-confirm-new-session nil))
         (easysession-switch-to name)
         (unless session-exists
-          (let ((default-directory dir))
+          (let ((default-directory (project-root pr)))
             (project-find-file))))))
 
   ;; Key mappings (C-c e prefix)
@@ -966,7 +994,12 @@ exists, switches to it.  Otherwise creates a new session and opens
   (global-set-key (kbd "C-c e d") #'easysession-delete)
   (global-set-key (kbd "C-c e P") #'jb-project-session-switch)
 
-  (easysession-setup))
+  ;; easysession-setup uses emacs-startup-hook internally, which has
+  ;; already fired by the time elpaca processes this form.  Call the
+  ;; underlying pieces directly instead.
+  (unless (getenv "EMACS_PROJECT_DIR")
+    (easysession-load-including-geometry))
+  (easysession-save-mode 1))
 
 ;; easysession-scratch: persist *scratch* buffer contents across sessions.
 (use-package easysession-scratch
