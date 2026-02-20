@@ -886,6 +886,12 @@ takes priority and the underlying mode's keys are suppressed."
   (treesit-auto-add-to-auto-mode-alist 'all)
   (global-treesit-auto-mode))
 
+;; kdl-mode: major mode for KDL document language files (.kdl).
+;; Uses tree-sitter for highlighting (auto-installs grammar), derives from
+;; prog-mode so auto-olivetti picks it up.
+(use-package kdl-mode
+  :ensure t)
+
 ;;; ============================================================================
 ;;; Code navigation
 ;;; ============================================================================
