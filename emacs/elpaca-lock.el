@@ -589,6 +589,25 @@
                                   https :inherit t :depth treeless :host github
                                   :ref
                                   "322157cb2f3bf7920ecd209dafc31bc1c7959f49"))
+ (typst-preview :source "elpaca-menu-lock-file" :recipe
+                (:package "typst-preview" :fetcher github :repo
+                          "havarddj/typst-preview.el" :files
+                          ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo"
+                           "doc/dir" "doc/*.info" "doc/*.texi" "doc/*.texinfo"
+                           "lisp/*.el" "docs/dir" "docs/*.info" "docs/*.texi"
+                           "docs/*.texinfo"
+                           (:exclude ".dir-locals.el" "test.el" "tests.el"
+                                     "*-test.el" "*-tests.el" "LICENSE"
+                                     "README*" "*-pkg.el"))
+                          :source "elpaca-menu-lock-file" :protocol https
+                          :inherit t :depth treeless :ref
+                          "7e89cf105e4fef5e79977a4a790d5b3b18d305f6"))
+ (typst-ts-mode :source "elpaca-menu-lock-file" :recipe
+                (:package "typst-ts-mode" :repo "meow_king/typst-ts-mode" :files
+                          ("*" (:exclude ".git")) :source
+                          "elpaca-menu-lock-file" :protocol https :inherit t
+                          :depth treeless :host codeberg :ref
+                          "1e8cc8072a22ac1dc07f1db356ca8f71c524d0c0"))
  (undo-fu :source "elpaca-menu-lock-file" :recipe
           (:package "undo-fu" :fetcher codeberg :repo "ideasman42/emacs-undo-fu"
                     :files
@@ -633,6 +652,19 @@
                          :source "elpaca-menu-lock-file" :protocol https
                          :inherit t :depth treeless :ref
                          "2d51ae8104f847c508abc3fe32663411449548f6"))
+ (websocket :source "elpaca-menu-lock-file" :recipe
+            (:package "websocket" :repo "ahyatt/emacs-websocket" :fetcher github
+                      :files
+                      ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo"
+                       "doc/dir" "doc/*.info" "doc/*.texi" "doc/*.texinfo"
+                       "lisp/*.el" "docs/dir" "docs/*.info" "docs/*.texi"
+                       "docs/*.texinfo"
+                       (:exclude ".dir-locals.el" "test.el" "tests.el"
+                                 "*-test.el" "*-tests.el" "LICENSE" "README*"
+                                 "*-pkg.el"))
+                      :source "elpaca-menu-lock-file" :protocol https :inherit t
+                      :depth treeless :ref
+                      "03d1cca4bd910a8df73e4ec637836c6ac25213a2"))
  (with-editor :source "elpaca-menu-lock-file" :recipe
               (:package "with-editor" :fetcher github :repo "magit/with-editor"
                         :files

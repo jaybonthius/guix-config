@@ -1030,6 +1030,10 @@ takes priority and the underlying mode's keys are suppressed."
   (add-to-list 'eglot-server-programs
                '(terraform-mode . ("terraform-ls" "serve")))
 
+  ;; Register tinymist as the Typst LSP server.
+  (add-to-list 'eglot-server-programs
+               '(typst-ts-mode . ("tinymist" "lsp")))
+
   (setq-default eglot-workspace-configuration
                 '(:gopls (:staticcheck t
                           :completeUnimported t)
@@ -1460,6 +1464,72 @@ REPORT-FN is the Flymake callback for reporting diagnostics."
 (use-package racket-xp
   :ensure nil
   :defer t)
+
+;;; Typst
+
+;; typst-ts-mode: tree-sitter based major mode for Typst documents.
+;; Provides syntax highlighting, indentation, imenu, and raw block
+;; highlighting.  LSP provided by tinymist via eglot.
+(use-package typst-ts-mode
+  :ensure (:host codeberg :repo "meow_king/typst-ts-mode")
+  :defer t
+  :mode "\\.typ\\'"
+  :hook ((typst-ts-mode . eglot-ensure))
+  :custom
+  (typst-ts-mode-enable-raw-blocks-highlight t)
+  :config
+  (add-to-list 'treesit-language-source-alist
+               '(typst "https://github.com/uben0/tree-sitter-typst"
+                       "master" "src"))
+  (unless (treesit-language-available-p 'typst)
+    (treesit-install-language-grammar 'typst)))
+
+;; typst-preview: live preview of Typst documents via tinymist.
+;; Fixed ports allow SSH port forwarding so the preview can be viewed
+;; in a local browser while editing remotely in terminal Emacs.
+;; Forward the data-plane port: ssh -L 23625:127.0.0.1:23625 remote-host
+;; Then open http://localhost:23625 in your local browser.
+(use-package typst-preview
+  :ensure t
+  :custom
+  (typst-preview-open-browser-automatically nil)
+  :init
+  ;; The upstream package hardcodes random ports (127.0.0.1:0) for the
+  ;; --host, --data-plane-host, and --control-plane-host flags, and
+  ;; tinymist rejects duplicate flags.  This advice rewrites the
+  ;; hardcoded values to fixed ports so we can set up SSH port
+  ;; forwarding in advance.  Placed in :init so the advice is active
+  ;; before typst-preview-start is ever called.
+  (defvar jb-typst-preview-data-plane-host "127.0.0.1:23625"
+    "Fixed data-plane host:port for typst-preview SSH forwarding.")
+  (defvar jb-typst-preview-control-plane-host "127.0.0.1:23626"
+    "Fixed control-plane host:port for typst-preview SSH forwarding.")
+
+  (define-advice start-process (:filter-args (args) jb-typst-preview-fixed-ports)
+    "Rewrite typst-preview process args to use fixed ports.
+Also remove the deprecated --host flag so tinymist does not start a
+redundant static file server on a random port."
+    (when (string= (car args) "typst-preview-proc")
+      (let ((result nil)
+            (rest (cddr args)))
+        ;; Walk the CLI args, dropping --host and its value, rewriting
+        ;; --data-plane-host and --control-plane-host values.
+        (while rest
+          (cond
+           ((string= (car rest) "--host")
+            (setq rest (cddr rest)))           ; skip flag + value
+           ((string= (car rest) "--data-plane-host")
+            (push (pop rest) result)           ; keep flag
+            (push jb-typst-preview-data-plane-host result) ; replace value
+            (pop rest))                        ; skip original value
+           ((string= (car rest) "--control-plane-host")
+            (push (pop rest) result)           ; keep flag
+            (push jb-typst-preview-control-plane-host result)
+            (pop rest))
+           (t
+            (push (pop rest) result))))
+        (setq args (append (list (car args) (cadr args)) (nreverse result)))))
+    args))
 
 ;;; ============================================================================
 ;;; Load custom.el
