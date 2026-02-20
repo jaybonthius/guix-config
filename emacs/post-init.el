@@ -804,10 +804,6 @@ olivetti-centered text instead of appearing at column 0."
          (margin-width (or (car (window-margins)) 0)))
     (when (< margin-width 2)
       (setq margin-width 2))
-    (message "diff-hl-inline: type=%s mw=%d lmw=%s win-margins=%S thread=%s ovl=%S"
-             type margin-width left-margin-width (window-margins)
-             (if (eq (current-thread) main-thread) "main" "bg")
-             ovl)
     (let* ((padding (propertize (make-string (max 0 (- margin-width 2)) ?\s) 'face 'default))
            (gap (propertize " " 'face 'default))
            (indicator (concat padding (propertize "▎" 'face face) gap)))
@@ -821,11 +817,25 @@ Olivetti provides large margins when active; this covers the case
 when it is not."
   (when (and diff-hl-mode (< (or left-margin-width 0) 2))
     (setq-local left-margin-width 2)
-    (message "diff-hl-ensure-margin: set lmw=2, windows=%S"
-             (get-buffer-window-list nil nil t))
     ;; Force the window to pick up the new margin width.
     (dolist (win (get-buffer-window-list nil nil t))
       (set-window-buffer win (current-buffer)))))
+
+(defun jb-diff-hl-update-on-window-change ()
+  "Re-apply diff-hl margins and refresh overlays after a window change.
+Ensures the margin indicator padding stays correct when olivetti
+recalculates margins for a new window geometry."
+  (when (bound-and-true-p diff-hl-mode)
+    (jb-diff-hl-ensure-margin)
+    (diff-hl-update)))
+
+(defun jb-diff-hl-on-enable ()
+  "Register or deregister the window-change hook for diff-hl."
+  (if diff-hl-mode
+      (add-hook 'window-configuration-change-hook
+                #'jb-diff-hl-update-on-window-change nil t)
+    (remove-hook 'window-configuration-change-hook
+                 #'jb-diff-hl-update-on-window-change t)))
 
 (use-package diff-hl
   :ensure t
@@ -834,7 +844,8 @@ when it is not."
              diff-hl-flydiff-mode)
   :hook ((prog-mode . diff-hl-mode)
          (magit-post-refresh . diff-hl-magit-post-refresh)
-         (diff-hl-mode . jb-diff-hl-ensure-margin))
+         (diff-hl-mode . jb-diff-hl-ensure-margin)
+         (diff-hl-mode . jb-diff-hl-on-enable))
   :init
   (setq diff-hl-flydiff-delay 0.4)
   (setq diff-hl-show-staged-changes nil)
