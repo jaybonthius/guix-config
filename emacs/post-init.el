@@ -1035,6 +1035,8 @@ takes priority and the underlying mode's keys are suppressed."
   (add-to-list 'eglot-server-programs
                '(typst-ts-mode . ("tinymist" "lsp")))
 
+  (add-hook 'eglot-managed-mode-hook (lambda () (eglot-inlay-hints-mode -1)))
+
   (setq-default eglot-workspace-configuration
                 '(:gopls (:staticcheck t
                           :completeUnimported t)
