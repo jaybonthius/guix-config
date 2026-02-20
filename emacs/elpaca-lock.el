@@ -232,11 +232,6 @@
                   :source "elpaca-menu-lock-file" :protocol https :inherit t
                   :depth treeless :host github :ref
                   "407e3b345c935b931b7c2f9ee2ad525f8bc63432"))
- (flyover :source "elpaca-menu-lock-file" :recipe
-          (:package "flyover" :fetcher github :repo "konrad1977/flyover" :files
-                    ("flyover.el") :source "elpaca-menu-lock-file" :protocol
-                    https :inherit t :depth treeless :ref
-                    "4e14ec26bf6668f4ba83171b70c62ad97743fed4"))
  (hcl-mode :source "elpaca-menu-lock-file" :recipe
            (:package "hcl-mode" :repo "hcl-emacs/hcl-mode" :fetcher github
                      :files

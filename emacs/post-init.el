@@ -908,26 +908,6 @@ takes priority and the underlying mode's keys are suppressed."
   :ensure t)
 
 ;;; ============================================================================
-;;; Diagnostics display
-;;; ============================================================================
-
-;; flyover: aesthetic diagnostic overlays for Flymake.
-(use-package flyover
-  :ensure t
-  :hook (flymake-mode . flyover-mode)
-  :custom
-  (flyover-checkers '(flymake))
-  (flyover-levels '(error warning info))
-  (flyover-hide-checker-name t)
-  :custom-face
-  (flyover-error   ((((background light)) :foreground "#d15120" :background "#fdf2ed")
-                    (((background dark))  :foreground "#d15120" :background "#2a1f1f")))
-  (flyover-warning ((((background light)) :foreground "#cf7900" :background "#fdf9f2")
-                    (((background dark))  :foreground "#d97a35" :background "#272122")))
-  (flyover-info    ((((background light)) :foreground "#5f9411" :background "#eff8e9")
-                    (((background dark))  :foreground "#81af34" :background "#1a2321"))))
-
-;;; ============================================================================
 ;;; Code navigation
 ;;; ============================================================================
 
