@@ -103,6 +103,20 @@
                     :source "elpaca-menu-lock-file" :protocol https :inherit t
                     :depth treeless :ref
                     "d1d39d52151a10f7ca29aa291886e99534cc94db"))
+ (consult-project-extra :source "elpaca-menu-lock-file" :recipe
+                        (:package "consult-project-extra" :fetcher github :repo
+                                  "Qkessler/consult-project-extra" :files
+                                  ("*.el" "*.el.in" "dir" "*.info" "*.texi"
+                                   "*.texinfo" "doc/dir" "doc/*.info"
+                                   "doc/*.texi" "doc/*.texinfo" "lisp/*.el"
+                                   "docs/dir" "docs/*.info" "docs/*.texi"
+                                   "docs/*.texinfo"
+                                   (:exclude ".dir-locals.el" "test.el"
+                                             "tests.el" "*-test.el" "*-tests.el"
+                                             "LICENSE" "README*" "*-pkg.el"))
+                                  :source "elpaca-menu-lock-file" :protocol
+                                  https :inherit t :depth treeless :ref
+                                  "2b3fa36fd3a14deacf594f4acd54d220d6890c55"))
  (corfu :source "elpaca-menu-lock-file" :recipe
         (:package "corfu" :repo "minad/corfu" :files
                   (:defaults "extensions/corfu-*.el") :fetcher github :source

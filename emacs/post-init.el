@@ -653,6 +653,13 @@ takes priority and the underlying mode's keys are suppressed."
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 
+;; consult-project-extra: unified consult interface for project.el
+;; (project buffers, project files, and known projects via narrowing).
+(use-package consult-project-extra
+  :ensure t
+  :bind (("C-x p f" . consult-project-extra-find)
+         ("C-x p F" . consult-project-extra-find-other-window)))
+
 ;;; ============================================================================
 ;;; Completion (in-buffer): Corfu + Cape
 ;;; ============================================================================
