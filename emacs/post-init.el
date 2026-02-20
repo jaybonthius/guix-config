@@ -796,13 +796,19 @@ takes priority and the underlying mode's keys are suppressed."
 (use-package diff-hl
   :ensure t
   :commands (diff-hl-mode
-             global-diff-hl-mode)
-  :hook (prog-mode . diff-hl-mode)
+             global-diff-hl-mode
+             diff-hl-flydiff-mode)
+  :hook ((prog-mode . diff-hl-mode)
+         (magit-post-refresh . diff-hl-magit-post-refresh))
   :init
   (setq diff-hl-flydiff-delay 0.4)
   (setq diff-hl-show-staged-changes nil)
   (setq diff-hl-update-async t)
-  (setq diff-hl-global-modes '(not pdf-view-mode image-mode)))
+  (setq diff-hl-global-modes '(not pdf-view-mode image-mode))
+  :config
+  (diff-hl-flydiff-mode 1)
+  (unless (display-graphic-p)
+    (diff-hl-margin-mode 1)))
 
 ;;; ============================================================================
 ;;; Snippets
