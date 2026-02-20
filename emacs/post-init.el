@@ -188,19 +188,20 @@
   :ensure (:host github :repo "Bogdanp/twilight-anti-bright-theme")
   :demand t)
 
-(defun jb-system-dark-mode-p ()
-  "Return non-nil if macOS is in dark mode."
-  (when (eq system-type 'darwin)
-    (string-match-p
-     "Dark"
-     (shell-command-to-string
-      "defaults read -g AppleInterfaceStyle 2>/dev/null || echo Light"))))
+;; Time-based theme: dark (twilight-anti-bright) after 6pm Pacific,
+;; light (twilight-bright) otherwise.  Only checked at startup.
 
-(defun jb-detect-and-apply-system-theme ()
-  "Detect macOS appearance and load the matching twilight theme."
+(defun jb-dark-mode-p ()
+  "Return non-nil if it is after 6pm or before 6am Pacific time."
+  (let* ((process-environment (cons "TZ=America/Los_Angeles" process-environment))
+         (hour (string-to-number (format-time-string "%H"))))
+    (or (>= hour 18) (< hour 6))))
+
+(defun jb-apply-time-theme ()
+  "Load twilight-anti-bright after 6pm Pacific, twilight-bright otherwise."
   (interactive)
   (mapc #'disable-theme custom-enabled-themes)
-  (if (jb-system-dark-mode-p)
+  (if (jb-dark-mode-p)
       (load-theme 'twilight-anti-bright t)
     (load-theme 'twilight-bright t)))
 
@@ -213,8 +214,8 @@
         (load-theme 'twilight-anti-bright t)
       (load-theme 'twilight-bright t))))
 
-;; Apply system theme after Elpaca has installed and activated theme packages.
-(add-hook 'elpaca-after-init-hook #'jb-detect-and-apply-system-theme)
+;; Apply time-based theme after Elpaca has installed and activated theme packages.
+(add-hook 'elpaca-after-init-hook #'jb-apply-time-theme)
 
 ;;; Ligatures
 
