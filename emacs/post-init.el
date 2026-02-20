@@ -1420,7 +1420,7 @@ REPORT-FN is the Flymake callback for reporting diagnostics."
 
 ;; racket-mode: major mode for Racket source files.
 (use-package racket-mode
-  :ensure t
+  :ensure nil
   :defer t
   :mode (("\\.rkt\\'" . racket-mode))
   :config
@@ -1438,7 +1438,7 @@ REPORT-FN is the Flymake callback for reporting diagnostics."
 ;; racket-xp-mode: cross-reference and analysis annotations.
 ;; Hooks registered above via standalone add-hook calls.
 (use-package racket-xp
-  :ensure (racket-mode :host github :repo "greghendershott/racket-mode")
+  :ensure nil
   :defer t)
 
 ;;; ============================================================================
