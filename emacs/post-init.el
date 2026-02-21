@@ -12,7 +12,7 @@
   :ensure t
   :demand t
   :custom
-  (compile-angel-verbose t)
+  (compile-angel-verbose nil)
   :config
   (push "/init.el" compile-angel-excluded-files)
   (push "/early-init.el" compile-angel-excluded-files)
@@ -92,7 +92,7 @@
   (auto-revert-interval 3)
   (auto-revert-remote-files nil)
   (auto-revert-use-notify t)
-  (auto-revert-avoid-polling nil)
+  (auto-revert-avoid-polling t)
   (auto-revert-verbose t))
 
 ;; Recentf: maintain a list of recently accessed files.
@@ -883,14 +883,23 @@ recalculates margins for a new window geometry."
 ;;; Tree-sitter
 ;;; ============================================================================
 
-;; treesit-auto: automatically install and use tree-sitter grammars.
+;; treesit-auto: keep the package for grammar installation only.
+;; `global-treesit-auto-mode' is intentionally disabled because
+;; `treesit-auto--ready-p' runs on every `find-file' and takes ~1.8s
+;; per call (known issue: treesit-auto#135).  Instead, remap modes
+;; manually via `major-mode-remap-alist'.
 (use-package treesit-auto
   :ensure t
   :custom
-  (treesit-auto-install t)
-  :config
-  (treesit-auto-add-to-auto-mode-alist 'all)
-  (global-treesit-auto-mode))
+  (treesit-auto-install 'prompt))
+
+(setq major-mode-remap-alist
+      '((python-mode    . python-ts-mode)
+        (json-mode      . json-ts-mode)
+        (sh-mode        . bash-ts-mode)
+        (css-mode       . css-ts-mode)
+        (yaml-mode      . yaml-ts-mode)
+        (toml-mode      . toml-ts-mode)))
 
 ;; kdl-mode: major mode for KDL document language files (.kdl).
 ;; Uses tree-sitter for highlighting (auto-installs grammar), derives from
@@ -1015,6 +1024,9 @@ recalculates margins for a new window geometry."
 
   (add-hook 'eglot-managed-mode-hook (lambda () (eglot-inlay-hints-mode -1)))
 
+  ;; Disable the JSONRPC events buffer to avoid logging overhead.
+  (setq eglot-events-buffer-size 0)
+
   (setq-default eglot-workspace-configuration
                 '(:gopls (:staticcheck t
                           :completeUnimported t)
@@ -1040,6 +1052,7 @@ recalculates margins for a new window geometry."
 (use-package go-ts-mode
   :ensure nil
   :defer t
+  :mode "\\.go\\'"
   :hook ((go-ts-mode . eglot-ensure))
   :config
   (setq go-ts-mode-indent-offset tab-width)
