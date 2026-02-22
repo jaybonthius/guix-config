@@ -1,11 +1,17 @@
-#+TITLE: Guix Home Configuration
+#+TITLE: Dotfiles
 
 * Setup
+
+Clone into the home directory:
+
+#+begin_src sh
+git clone git@github.com:jaybonthius/dotfiles.git ~/dotfiles
+#+end_src
 
 Reconfigure the home environment:
 
 #+begin_src sh
-guix home reconfigure -L ~/.config/guix ~/.config/guix/home.scm
+guix home reconfigure -L ~/dotfiles ~/dotfiles/home.scm
 #+end_src
 
 * Git & SSH Setup
