@@ -1,0 +1,39 @@
+#+TITLE: Guix Home Configuration
+
+* Setup
+
+Reconfigure the home environment:
+
+#+begin_src sh
+guix home reconfigure -L ~/.config/guix ~/.config/guix/home.scm
+#+end_src
+
+* Git & SSH Setup
+
+After reconfiguring, set up Git authentication:
+
+1. Remove the old manual gitconfig (if it exists):
+
+   #+begin_src sh
+   rm -f ~/.gitconfig
+   #+end_src
+
+2. Generate an SSH key:
+
+   #+begin_src sh
+   ssh-keygen -t ed25519 -C "jaybonthius@gmail.com" -N ""
+   #+end_src
+
+3. Copy the public key:
+
+   #+begin_src sh
+   cat ~/.ssh/id_ed25519.pub
+   #+end_src
+
+4. Add it to GitHub: https://github.com/settings/ssh/new
+
+5. Test the connection:
+
+   #+begin_src sh
+   ssh -T git@github.com
+   #+end_src

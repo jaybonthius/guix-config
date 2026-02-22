@@ -43,6 +43,13 @@
            (list "emacs/post-init.el"
                  (local-file "emacs/post-init.el"))))
 
+   ;; Git configuration
+   (simple-service
+    'git-config
+    home-xdg-configuration-files-service-type
+    (list (list "git/config"
+                (local-file "git/config"))))
+
     ;; Zellij configuration: symlink config and layout files
     ;; into ~/.config/zellij/
     (simple-service

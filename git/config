@@ -1,0 +1,6 @@
+[user]
+	name = Jay Bonthius
+	email = jaybonthius@gmail.com
+
+[init]
+	defaultBranch = main
