@@ -2,11 +2,12 @@
              (gnu home services shells)
              (gnu packages shells)
              (gnu services)
-             (guix gexp))
+             (guix gexp)
+             (opencode))
 
 (home-environment
  (packages
-  (list fish))
+  (list fish opencode))
  (services
   (list
    (service home-fish-service-type
