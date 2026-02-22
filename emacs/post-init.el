@@ -63,6 +63,16 @@
 (unless (display-graphic-p)
   (xterm-mouse-mode 1))
 
+;; Guix Home: reconfigure dotfiles from within Emacs.
+(defun jb-guix-home-reconfigure ()
+  "Run `guix home reconfigure' to apply dotfiles changes.
+Uses `compile' so output is displayed in a *compilation* buffer
+with clickable error locations."
+  (interactive)
+  (compile "guix home reconfigure -L ~/dotfiles ~/dotfiles/home.scm"))
+
+(global-set-key (kbd "C-c g r") #'jb-guix-home-reconfigure)
+
 ;; Ask before quitting Emacs.
 (setq confirm-kill-emacs 'y-or-n-p)
 
