@@ -47,12 +47,6 @@ install_guix() {
         exit 1
     fi
 
-    echo "Authorizing substitute servers..."
-    sudo guix archive --authorize < \
-        ~root/.config/guix/current/share/guix/bordeaux.guix.gnu.org.pub
-    sudo guix archive --authorize < \
-        ~root/.config/guix/current/share/guix/ci.guix.gnu.org.pub
-
     echo "Guix installed successfully."
 }
 
