@@ -32,6 +32,10 @@ layout {
         }
     }
 
+    tab name="opencode" {
+        pane command="opencode"
+    }
+
     tab name="terminal" {
         pane
     }

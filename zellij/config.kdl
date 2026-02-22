@@ -59,6 +59,7 @@ keybinds clear-defaults=true {
         }
         bind "Super l" { ToggleTab; }
         bind "Super e" { GoToTab 1; SwitchToMode "locked"; }
+        bind "Super o" { GoToTab 2; SwitchToMode "locked"; }
     }
 
     // Command mode (entered via Super+r)
