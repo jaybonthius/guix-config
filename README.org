@@ -27,7 +27,7 @@ After reconfiguring, set up Git authentication:
 2. Generate an SSH key:
 
    #+begin_src sh
-   ssh-keygen -t ed25519 -C "jaybonthius@gmail.com" -N ""
+   ssh-keygen -t ed25519 -C "your.username@email.com" -N ""
    #+end_src
 
 3. Copy the public key:
