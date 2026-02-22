@@ -1,0 +1,38 @@
+// Project layout for zellij
+// Usage: zellij -s <session-name> --layout project options --default-cwd /path/to/project
+//
+// Tab 1: emacs (EMACS_SESSION_NAME set from the zellij session name)
+// Tab 2: terminal
+
+layout {
+    default_tab_template {
+        pane size=1 borderless=true {
+            plugin location="tab-bar"
+        }
+        children
+        pane size=1 borderless=true {
+            plugin location="status-bar"
+        }
+    }
+
+    // New tabs created at runtime get a plain terminal with status bars
+    new_tab_template {
+        pane size=1 borderless=true {
+            plugin location="tab-bar"
+        }
+        pane
+        pane size=1 borderless=true {
+            plugin location="status-bar"
+        }
+    }
+
+    tab name="editor" focus=true {
+        pane command="bash" {
+            args "-c" "EMACS_SESSION_NAME=$ZELLIJ_SESSION_NAME exec emacs -nw"
+        }
+    }
+
+    tab name="terminal" {
+        pane
+    }
+}

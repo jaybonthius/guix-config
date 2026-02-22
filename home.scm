@@ -7,14 +7,16 @@
              (gnu services)
              (guix gexp)
              (minimal-emacs)
-             (opencode))
+             (opencode)
+             (zellij))
 
 (home-environment
  (packages
   (list emacs-no-x
         fish
         font-fira-code
-        opencode))
+        opencode
+        zellij))
  (services
   (list
    ;; Fish shell configuration
@@ -38,5 +40,15 @@
                 (local-file "emacs/pre-early-init.el"))
           (list "emacs/pre-init.el"
                 (local-file "emacs/pre-init.el"))
-          (list "emacs/post-init.el"
-                (local-file "emacs/post-init.el")))))))
+           (list "emacs/post-init.el"
+                 (local-file "emacs/post-init.el"))))
+
+    ;; Zellij configuration: symlink config and layout files
+    ;; into ~/.config/zellij/
+    (simple-service
+     'zellij-config
+     home-xdg-configuration-files-service-type
+     (list (list "zellij/config.kdl"
+                 (local-file "zellij/config.kdl"))
+           (list "zellij/layouts/project.kdl"
+                 (local-file "zellij/layouts/project.kdl")))))))
