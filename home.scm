@@ -1,5 +1,6 @@
 (use-modules (gnu home)
              (gnu home services shells)
+             (gnu packages emacs)
              (gnu packages shells)
              (gnu services)
              (guix gexp)
@@ -7,7 +8,7 @@
 
 (home-environment
  (packages
-  (list fish opencode))
+  (list emacs-no-x fish opencode))
  (services
   (list
    (service home-fish-service-type
