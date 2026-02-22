@@ -11,8 +11,9 @@
              (gnu services)
              (guix gexp)
              (minimal-emacs)
-             (opencode)
-             (zellij))
+              (opencode)
+              (zellij)
+              (zjstatus))
 
 (home-environment
  (packages
@@ -77,4 +78,7 @@
      (list (list "zellij/config.kdl"
                  (local-file "zellij/config.kdl"))
            (list "zellij/layouts/project.kdl"
-                 (local-file "zellij/layouts/project.kdl")))))))
+                 (local-file "zellij/layouts/project.kdl"))
+           (list "zellij/plugins/zjstatus.wasm"
+                 (file-append zjstatus
+                              "/share/zjstatus/zjstatus.wasm")))))))

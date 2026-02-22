@@ -6,23 +6,77 @@
 
 layout {
     default_tab_template {
-        pane size=1 borderless=true {
-            plugin location="tab-bar"
-        }
         children
         pane size=1 borderless=true {
-            plugin location="status-bar"
+            plugin location="file:~/.config/zellij/plugins/zjstatus.wasm" {
+                format_left   "{mode} #[fg=#89B4FA,bold]{session} #[fg=#6C7086]on #[fg=#a6e3a1]{command_hostname}"
+                format_center "{tabs}"
+                format_right  ""
+                format_space  ""
+
+                border_enabled  "false"
+
+                mode_normal        "#[bg=#89B4FA,fg=#1E1E2E,bold] NORMAL "
+                mode_locked        "#[bg=#6C7086,fg=#1E1E2E,bold] LOCKED "
+                mode_resize        "#[bg=#F38BA8,fg=#1E1E2E,bold] RESIZE "
+                mode_pane          "#[bg=#89B4FA,fg=#1E1E2E,bold] PANE "
+                mode_tab           "#[bg=#89B4FA,fg=#1E1E2E,bold] TAB "
+                mode_scroll        "#[bg=#A6E3A1,fg=#1E1E2E,bold] SCROLL "
+                mode_enter_search  "#[bg=#F9E2AF,fg=#1E1E2E,bold] SEARCH "
+                mode_search        "#[bg=#F9E2AF,fg=#1E1E2E,bold] SEARCH "
+                mode_rename_tab    "#[bg=#F9E2AF,fg=#1E1E2E,bold] RENAME "
+                mode_rename_pane   "#[bg=#F9E2AF,fg=#1E1E2E,bold] RENAME "
+                mode_session       "#[bg=#CBA6F7,fg=#1E1E2E,bold] SESSION "
+                mode_move          "#[bg=#F38BA8,fg=#1E1E2E,bold] MOVE "
+                mode_tmux          "#[bg=#FAB387,fg=#1E1E2E,bold] TMUX "
+
+                tab_normal              "#[fg=#6C7086] {name} "
+                tab_active              "#[fg=#89B4FA,bold,italic] {name} "
+                tab_separator           "#[fg=#45475A]|"
+
+                command_hostname_command     "hostname"
+                command_hostname_format      "{stdout}"
+                command_hostname_interval    "0"
+                command_hostname_rendermode  "static"
+            }
         }
     }
 
-    // New tabs created at runtime get a plain terminal with status bars
+    // New tabs created at runtime get a plain terminal with zjstatus bar
     new_tab_template {
-        pane size=1 borderless=true {
-            plugin location="tab-bar"
-        }
         pane
         pane size=1 borderless=true {
-            plugin location="status-bar"
+            plugin location="file:~/.config/zellij/plugins/zjstatus.wasm" {
+                format_left   "{mode} #[fg=#89B4FA,bold]{session} #[fg=#6C7086]on #[fg=#a6e3a1]{command_hostname}"
+                format_center "{tabs}"
+                format_right  ""
+                format_space  ""
+
+                border_enabled  "false"
+
+                mode_normal        "#[bg=#89B4FA,fg=#1E1E2E,bold] NORMAL "
+                mode_locked        "#[bg=#6C7086,fg=#1E1E2E,bold] LOCKED "
+                mode_resize        "#[bg=#F38BA8,fg=#1E1E2E,bold] RESIZE "
+                mode_pane          "#[bg=#89B4FA,fg=#1E1E2E,bold] PANE "
+                mode_tab           "#[bg=#89B4FA,fg=#1E1E2E,bold] TAB "
+                mode_scroll        "#[bg=#A6E3A1,fg=#1E1E2E,bold] SCROLL "
+                mode_enter_search  "#[bg=#F9E2AF,fg=#1E1E2E,bold] SEARCH "
+                mode_search        "#[bg=#F9E2AF,fg=#1E1E2E,bold] SEARCH "
+                mode_rename_tab    "#[bg=#F9E2AF,fg=#1E1E2E,bold] RENAME "
+                mode_rename_pane   "#[bg=#F9E2AF,fg=#1E1E2E,bold] RENAME "
+                mode_session       "#[bg=#CBA6F7,fg=#1E1E2E,bold] SESSION "
+                mode_move          "#[bg=#F38BA8,fg=#1E1E2E,bold] MOVE "
+                mode_tmux          "#[bg=#FAB387,fg=#1E1E2E,bold] TMUX "
+
+                tab_normal              "#[fg=#6C7086] {name} "
+                tab_active              "#[fg=#89B4FA,bold,italic] {name} "
+                tab_separator           "#[fg=#45475A]|"
+
+                command_hostname_command     "hostname"
+                command_hostname_format      "{stdout}"
+                command_hostname_interval    "0"
+                command_hostname_rendermode  "static"
+            }
         }
     }
 
