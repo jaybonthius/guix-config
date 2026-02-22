@@ -67,6 +67,10 @@ reconfigure() {
 
 fish_plugins() {
     echo "Installing fish plugins..."
+    source_guix_profile
+    if [ -f "$HOME/.profile" ]; then
+        . "$HOME/.profile"
+    fi
     fish -c 'fisher update'
 }
 
