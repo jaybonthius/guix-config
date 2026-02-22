@@ -30,6 +30,15 @@ install_guix() {
     echo "      It is optional and fails on some Ubuntu versions."
     echo ""
 
+    # Clean up any partial previous install
+    if [ -d /var/guix ] || [ -d /gnu ]; then
+        echo "Cleaning up partial previous install..."
+        sudo ./guix-install.sh --uninstall || true
+        cd /tmp
+        wget -q https://guix.gnu.org/guix-install.sh
+        chmod +x guix-install.sh
+    fi
+
     sudo ./guix-install.sh || true
     rm -f /tmp/guix-install.sh
 
