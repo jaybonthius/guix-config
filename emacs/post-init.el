@@ -204,35 +204,44 @@ with clickable error locations."
   :ensure (:host github :repo "Bogdanp/twilight-anti-bright-theme")
   :demand t)
 
-;; Time-based theme: dark (twilight-anti-bright) after 6pm Pacific,
-;; light (twilight-bright) otherwise.  Only checked at startup.
+;; Remember theme: persist the last-used theme across sessions.
+;; On quit, the current theme name is saved to ~/.emacs-theme.
+;; On startup, that theme is restored (defaulting to twilight-anti-bright).
 
-(defun jb-dark-mode-p ()
-  "Return non-nil if it is after 6pm or before 6am Pacific time."
-  (let* ((process-environment (cons "TZ=America/Los_Angeles" process-environment))
-         (hour (string-to-number (format-time-string "%H"))))
-    (or (>= hour 18) (< hour 6))))
+(defvar jb-theme-file (expand-file-name "~/.emacs-theme")
+  "File used to remember the last active theme between sessions.")
 
-(defun jb-apply-time-theme ()
-  "Load twilight-anti-bright after 6pm Pacific, twilight-bright otherwise."
-  (interactive)
+(defun jb-save-theme ()
+  "Save the current theme name to `jb-theme-file'."
+  (when-let* ((theme (car custom-enabled-themes)))
+    (with-temp-file jb-theme-file
+      (insert (symbol-name theme) "\n"))))
+
+(defun jb-load-remembered-theme ()
+  "Load the theme saved in `jb-theme-file', or twilight-anti-bright."
   (mapc #'disable-theme custom-enabled-themes)
-  (if (jb-dark-mode-p)
-      (load-theme 'twilight-anti-bright t)
-    (load-theme 'twilight-bright t)))
+  (let ((theme (when (file-exists-p jb-theme-file)
+                 (with-temp-buffer
+                   (insert-file-contents jb-theme-file)
+                   (let ((name (string-trim (buffer-string))))
+                     (unless (string-empty-p name)
+                       (intern name)))))))
+    (load-theme (or theme 'twilight-anti-bright) t)))
 
 (defun toggle-twilight-theme ()
   "Toggle between twilight-bright and twilight-anti-bright themes."
   (interactive)
   (let ((current (car custom-enabled-themes)))
     (mapc #'disable-theme custom-enabled-themes)
-    (if
-        (eq current 'twilight-bright)
+    (if (eq current 'twilight-bright)
         (load-theme 'twilight-anti-bright t)
-      (load-theme 'twilight-bright t))))
+      (load-theme 'twilight-bright t)))
+  (jb-save-theme))
 
-;; Apply time-based theme after Elpaca has installed and activated theme packages.
-(add-hook 'elpaca-after-init-hook #'jb-apply-time-theme)
+;; Restore remembered theme after Elpaca has installed and activated theme packages.
+(add-hook 'elpaca-after-init-hook #'jb-load-remembered-theme)
+;; Save theme on quit.
+(add-hook 'kill-emacs-hook #'jb-save-theme)
 
 ;;; Ligatures
 
