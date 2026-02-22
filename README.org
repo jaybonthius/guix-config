@@ -1,28 +1,38 @@
 #+TITLE: Dotfiles
 
-* Setup
+* Fresh Machine Setup
 
-Clone into the home directory:
+Clone the repo and run the install script:
 
 #+begin_src sh
-git clone git@github.com:jaybonthius/dotfiles.git ~/dotfiles
+git clone https://github.com/jaybonthius/dotfiles.git ~/dotfiles
+~/dotfiles/install.sh
 #+end_src
 
-Reconfigure the home environment:
+This will:
+1. Install GNU Guix (requires sudo; prompts for confirmation)
+2. Authorize substitute servers (pre-built binaries)
+3. Run =guix pull= to fetch the latest Guix (slow on first run)
+4. Run =guix home reconfigure= to apply the home configuration
+5. Install fish shell plugins via fisher
+
+After setup completes, log out and back in (or =source ~/.profile=) to
+activate the environment.
+
+** Individual Steps
+
+You can run each step independently:
 
 #+begin_src sh
-guix home reconfigure -L ~/dotfiles ~/dotfiles/home.scm
-#+end_src
-
-Install fish plugins:
-
-#+begin_src sh
-fisher update
+~/dotfiles/install.sh install-guix    # Install Guix package manager
+~/dotfiles/install.sh pull            # Update Guix
+~/dotfiles/install.sh reconfigure     # Apply home configuration
+~/dotfiles/install.sh fish-plugins    # Install fish shell plugins
 #+end_src
 
 * Git & SSH Setup
 
-After reconfiguring, set up Git authentication:
+After the home environment is configured, set up Git authentication:
 
 1. Remove the old manual gitconfig (if it exists):
 
@@ -48,4 +58,11 @@ After reconfiguring, set up Git authentication:
 
    #+begin_src sh
    ssh -T git@github.com
+   #+end_src
+
+6. Update the remote to use SSH:
+
+   #+begin_src sh
+   cd ~/dotfiles
+   git remote set-url origin git@github.com:jaybonthius/dotfiles.git
    #+end_src

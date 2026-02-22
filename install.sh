@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
+GUIX_PROFILE="$HOME/.config/guix/current"
+
+source_guix_profile() {
+    if [ -f "$GUIX_PROFILE/etc/profile" ]; then
+        . "$GUIX_PROFILE/etc/profile"
+    fi
+}
+
+install_guix() {
+    if command -v guix >/dev/null 2>&1; then
+        echo "Guix is already installed, skipping."
+        return
+    fi
+
+    echo "Installing prerequisites..."
+    sudo apt-get update -qq
+    sudo apt-get install -y -qq wget xz-utils gnupg uidmap
+
+    echo "Downloading Guix installer..."
+    cd /tmp
+    wget -q https://guix.gnu.org/guix-install.sh
+    chmod +x guix-install.sh
+
+    echo "Running Guix installer (this will ask for confirmation)..."
+    sudo ./guix-install.sh
+    rm -f /tmp/guix-install.sh
+
+    echo "Authorizing substitute servers..."
+    sudo guix archive --authorize < \
+        ~root/.config/guix/current/share/guix/bordeaux.guix.gnu.org.pub
+    sudo guix archive --authorize < \
+        ~root/.config/guix/current/share/guix/ci.guix.gnu.org.pub
+
+    echo "Guix installed successfully."
+}
+
+pull() {
+    echo "Updating Guix (this may take a while on first run)..."
+    source_guix_profile
+    guix pull
+    echo ""
+    echo "Guix updated. Sourcing new profile..."
+    source_guix_profile
+}
+
+reconfigure() {
+    echo "Applying home configuration..."
+    source_guix_profile
+    guix home reconfigure -L "$DOTFILES_DIR" "$DOTFILES_DIR/home.scm"
+}
+
+fish_plugins() {
+    echo "Installing fish plugins..."
+    fish -c 'fisher update'
+}
+
+case "${1:-setup}" in
+    setup)
+        install_guix
+        pull
+        reconfigure
+        fish_plugins
+        echo ""
+        echo "Done! Log out and back in (or run 'source ~/.profile') to activate."
+        ;;
+    install-guix)  install_guix ;;
+    pull)          pull ;;
+    reconfigure)   reconfigure ;;
+    fish-plugins)  fish_plugins ;;
+    *)
+        echo "Usage: $0 [setup|install-guix|pull|reconfigure|fish-plugins]"
+        echo ""
+        echo "  setup          Full setup from scratch (default)"
+        echo "  install-guix   Install Guix package manager (requires sudo)"
+        echo "  pull           Update Guix"
+        echo "  reconfigure    Apply Guix Home configuration"
+        echo "  fish-plugins   Install fish shell plugins"
+        exit 1
+        ;;
+esac
