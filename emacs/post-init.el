@@ -184,28 +184,18 @@
 
 ;;; Themes
 
-;; modus-themes: highly accessible themes (WCAG AAA contrast).
-;; modus-operandi-tinted (warm light) / modus-vivendi-tinted (night sky dark).
-(use-package modus-themes
-  :ensure t
-  :demand t
-  :bind (("<f5>" . modus-themes-toggle))
-  :custom
-  (modus-themes-to-toggle '(modus-operandi-tinted modus-vivendi-tinted))
-  (modus-themes-italic-constructs t)
-  (modus-themes-bold-constructs t)
-  (modus-themes-mixed-fonts t)
-  (modus-themes-headings
-   '((1 . (1.3))
-     (2 . (1.2))
-     (3 . (1.1))
-     (t . (1.0))))
-  (modus-themes-completions '((matches . (bold))
-                              (selection . (semibold))))
-  (modus-themes-prompts '(bold)))
+;; twilight-bright-theme: a clean light theme (bogdan's fork).
+(use-package twilight-bright-theme
+  :ensure (:host github :repo "Bogdanp/twilight-bright-theme.el")
+  :demand t)
 
-;; Time-based theme: dark (modus-vivendi-tinted) after 6pm Pacific,
-;; light (modus-operandi-tinted) otherwise.  Only checked at startup.
+;; twilight-anti-bright-theme: the dark counterpart (bogdan's fork).
+(use-package twilight-anti-bright-theme
+  :ensure (:host github :repo "Bogdanp/twilight-anti-bright-theme")
+  :demand t)
+
+;; Time-based theme: dark (twilight-anti-bright) after 6pm Pacific,
+;; light (twilight-bright) otherwise.  Only checked at startup.
 
 (defun jb-dark-mode-p ()
   "Return non-nil if it is after 6pm or before 6am Pacific time."
@@ -214,11 +204,22 @@
     (or (>= hour 18) (< hour 6))))
 
 (defun jb-apply-time-theme ()
-  "Load modus-vivendi-tinted after 6pm Pacific, modus-operandi-tinted otherwise."
+  "Load twilight-anti-bright after 6pm Pacific, twilight-bright otherwise."
   (interactive)
+  (mapc #'disable-theme custom-enabled-themes)
   (if (jb-dark-mode-p)
-      (modus-themes-load-theme 'modus-vivendi-tinted)
-    (modus-themes-load-theme 'modus-operandi-tinted)))
+      (load-theme 'twilight-anti-bright t)
+    (load-theme 'twilight-bright t)))
+
+(defun toggle-twilight-theme ()
+  "Toggle between twilight-bright and twilight-anti-bright themes."
+  (interactive)
+  (let ((current (car custom-enabled-themes)))
+    (mapc #'disable-theme custom-enabled-themes)
+    (if
+        (eq current 'twilight-bright)
+        (load-theme 'twilight-anti-bright t)
+      (load-theme 'twilight-bright t))))
 
 ;; Apply time-based theme after Elpaca has installed and activated theme packages.
 (add-hook 'elpaca-after-init-hook #'jb-apply-time-theme)
@@ -1066,7 +1067,22 @@ takes priority and the underlying mode's keys are suppressed."
   :bind
   (:map markdown-mode-map
         ("C-c C-e" . markdown-do))
-  )
+  :custom-face
+  ;; Per-level heading colors: warm→cool rainbow using twilight palette.
+  ;; Colors only (no height scaling) — works for both light and dark themes.
+  ;; Light values from twilight-bright, dark values from twilight-anti-bright.
+  (markdown-header-face-1 ((((background light)) :foreground "#d15120" :weight bold)
+                           (((background dark))  :foreground "#d15120" :weight bold)))
+  (markdown-header-face-2 ((((background light)) :foreground "#cf7900" :weight bold)
+                           (((background dark))  :foreground "#d97a35" :weight bold)))
+  (markdown-header-face-3 ((((background light)) :foreground "#d2ad00" :weight bold)
+                           (((background dark))  :foreground "#deae3e" :weight bold)))
+  (markdown-header-face-4 ((((background light)) :foreground "#5f9411" :weight bold)
+                           (((background dark))  :foreground "#81af34" :weight bold)))
+  (markdown-header-face-5 ((((background light)) :foreground "#417598" :weight bold)
+                           (((background dark))  :foreground "#7e9fc9" :weight bold)))
+  (markdown-header-face-6 ((((background light)) :foreground "#a66bab" :weight bold)
+                           (((background dark))  :foreground "#a878b5" :weight bold))))
 
 ;;; Racket
 
