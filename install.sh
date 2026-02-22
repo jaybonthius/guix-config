@@ -25,9 +25,18 @@ install_guix() {
     wget -q https://guix.gnu.org/guix-install.sh
     chmod +x guix-install.sh
 
-    echo "Running Guix installer (this will ask for confirmation)..."
-    sudo ./guix-install.sh
+    echo ""
+    echo "NOTE: When the installer asks about AppArmor, answer 'n'."
+    echo "      It is optional and fails on some Ubuntu versions."
+    echo ""
+
+    sudo ./guix-install.sh || true
     rm -f /tmp/guix-install.sh
+
+    if ! command -v guix >/dev/null 2>&1; then
+        echo "ERROR: Guix installation failed." >&2
+        exit 1
+    fi
 
     echo "Authorizing substitute servers..."
     sudo guix archive --authorize < \
