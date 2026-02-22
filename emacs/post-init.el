@@ -321,7 +321,6 @@
 (add-hook 'after-init-hook #'show-paren-mode)
 (add-hook 'after-init-hook #'delete-selection-mode)
 (add-hook 'after-init-hook #'window-divider-mode)
-(add-hook 'after-init-hook #'global-hl-line-mode)
 (add-hook 'after-init-hook #'minibuffer-depth-indicate-mode)
 
 ;;; Uniquify: disambiguate buffer names with path components.
