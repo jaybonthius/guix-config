@@ -2,9 +2,12 @@
              (gnu home services)
              (gnu home services shells)
              (gnu packages emacs)
-              (gnu packages fonts)
-              (gnu packages racket)
-              (gnu packages shells)
+             (gnu packages fonts)
+             (gnu packages racket)
+             (gnu packages rust-apps)
+             (gnu packages shells)
+             (gnu packages shellutils)
+             (gnu packages terminals)
              (gnu services)
              (guix gexp)
              (minimal-emacs)
@@ -14,18 +17,32 @@
 (home-environment
  (packages
    (list emacs-no-x
+         eza
          fish
          font-fira-code
+         fzf
          opencode
          racket
-         zellij))
+         starship
+         zellij
+         zoxide))
  (services
   (list
    ;; Fish shell configuration
    (service home-fish-service-type
             (home-fish-configuration
              (config
-              (list (local-file "config.fish")))))
+              (list (local-file "fish/config.fish")))))
+
+   ;; Fish plugins: symlink fisher and fish_plugins
+   ;; into ~/.config/fish/
+   (simple-service
+    'fish-plugins
+    home-xdg-configuration-files-service-type
+    (list (list "fish/functions/fisher.fish"
+                (local-file "fish/functions/fisher.fish"))
+          (list "fish/fish_plugins"
+                (local-file "fish/fish_plugins"))))
 
    ;; Emacs configuration: symlink minimal-emacs.d init files and
    ;; personal config files into ~/.config/emacs/

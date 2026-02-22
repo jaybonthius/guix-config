@@ -1,0 +1,31 @@
+if status is-interactive
+    # Commands to run in interactive sessions can go here
+end
+
+# greeting
+function fish_greeting -d "What's up, fish?"
+    set_color $fish_color_autosuggestion
+    uname -nmsr
+
+    command -q uptime
+    and command uptime
+
+    set_color normal
+end
+
+# starship
+starship init fish | source
+
+# zoxide
+zoxide init --cmd cd fish | source
+
+# fzf
+set fzf_preview_dir_cmd eza --all --color=always
+functions -q fzf_configure_bindings && fzf_configure_bindings --history=\cr --directory=\cf --git_log=\cg --git_status=\cs --processes=\cp
+set fzf_preview_file_cmd cat -n
+
+# Go environment
+set -gx GOROOT /usr/local/go
+set -gx GOPATH $HOME/go
+set -gx GOBIN $GOPATH/bin
+fish_add_path $GOROOT/bin $GOBIN

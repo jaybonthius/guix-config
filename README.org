@@ -14,6 +14,12 @@ Reconfigure the home environment:
 guix home reconfigure -L ~/dotfiles ~/dotfiles/home.scm
 #+end_src
 
+Install fish plugins:
+
+#+begin_src sh
+fisher update
+#+end_src
+
 * Git & SSH Setup
 
 After reconfiguring, set up Git authentication:
