@@ -2,8 +2,9 @@
              (gnu home services)
              (gnu home services shells)
              (gnu packages emacs)
-             (gnu packages fonts)
-             (gnu packages shells)
+              (gnu packages fonts)
+              (gnu packages racket)
+              (gnu packages shells)
              (gnu services)
              (guix gexp)
              (minimal-emacs)
@@ -12,11 +13,12 @@
 
 (home-environment
  (packages
-  (list emacs-no-x
-        fish
-        font-fira-code
-        opencode
-        zellij))
+   (list emacs-no-x
+         fish
+         font-fira-code
+         opencode
+         racket
+         zellij))
  (services
   (list
    ;; Fish shell configuration
