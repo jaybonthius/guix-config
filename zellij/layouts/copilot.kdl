@@ -1,0 +1,37 @@
+// Copilot layout for zellij
+// Usage: zellij -s <session-name> --layout copilot options --default-cwd /path/to/project
+//
+// Tab 1: emacsclient connected to the Shepherd-managed Emacs daemon
+// Tab 2: copilot cli
+// Tab 3: terminal
+
+layout {
+    default_tab_template {
+        children
+        pane size=1 borderless=true {
+            plugin location="compact-bar"
+        }
+    }
+
+    // New tabs created at runtime get a plain terminal with zjstatus bar
+    new_tab_template {
+        pane
+        pane size=1 borderless=true {
+            plugin location="compact-bar"
+        }
+    }
+
+    tab name="editor" focus=true {
+        pane command="bash" {
+            args "-c" "exec emacsclient -t --alternate-editor=\"\""
+        }
+    }
+
+    tab name="copilot" {
+        pane command="copilot"
+    }
+
+    tab name="terminal" {
+        pane
+    }
+}
