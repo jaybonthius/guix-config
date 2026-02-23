@@ -66,3 +66,10 @@ After the home environment is configured, set up Git authentication:
    cd ~/dotfiles
    git remote set-url origin git@github.com:jaybonthius/dotfiles.git
    #+end_src
+
+
+* Other thing
+
+#+begin_src sh
+uv tool install basedpyright
+#+end_src

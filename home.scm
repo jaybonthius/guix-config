@@ -1,10 +1,13 @@
 (use-modules (gnu home)
              (gnu home services)
              (gnu home services shells)
-             (gnu packages emacs)
-             (gnu packages fonts)
-             (gnu packages racket)
-             (gnu packages rust-apps)
+              (gnu packages emacs)
+              (gnu packages fonts)
+              (gnu packages golang)
+              (gnu packages golang-apps)
+              (gnu packages python)
+              (gnu packages racket)
+              (gnu packages rust-apps)
              (gnu packages shells)
              (gnu packages shellutils)
              (gnu packages terminals)
@@ -12,21 +15,27 @@
              (guix gexp)
              (minimal-emacs)
               (opencode)
-              (zellij)
+               (uv)
+               (zellij)
               (zjstatus))
 
 (home-environment
  (packages
-   (list emacs-no-x
-         eza
-         fish
-         font-fira-code
-         fzf
-         opencode
-         racket
-         starship
-         zellij
-         zoxide))
+    (list emacs-no-x
+          eza
+          fish
+          font-fira-code
+          fzf
+          go
+          gopls
+          opencode
+          python
+          racket
+          ripgrep
+          starship
+          uv
+          zellij
+          zoxide))
  (services
   (list
    ;; Fish shell configuration
