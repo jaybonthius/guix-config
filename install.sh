@@ -65,6 +65,15 @@ reconfigure() {
     guix home reconfigure -L "$DOTFILES_DIR" "$DOTFILES_DIR/home.scm"
 }
 
+patch_bashrc() {
+    if grep -q '# Guix Home' "$HOME/.bashrc" 2>/dev/null; then
+        echo "~/.bashrc already sources Guix Home profile, skipping."
+        return
+    fi
+    echo "Patching ~/.bashrc to source Guix Home profile..."
+    printf '\n# Guix Home\n[ -f ~/.profile ] && . ~/.profile\n' >> "$HOME/.bashrc"
+}
+
 fish_plugins() {
     echo "Installing fish plugins..."
     source_guix_profile
@@ -79,6 +88,7 @@ case "${1:-setup}" in
         install_guix
         pull
         reconfigure
+        patch_bashrc
         fish_plugins
         echo ""
         echo "Done! Log out and back in (or run 'source ~/.profile') to activate."
@@ -86,14 +96,16 @@ case "${1:-setup}" in
     install-guix)  install_guix ;;
     pull)          pull ;;
     reconfigure)   reconfigure ;;
+    patch-bashrc)  patch_bashrc ;;
     fish-plugins)  fish_plugins ;;
     *)
-        echo "Usage: $0 [setup|install-guix|pull|reconfigure|fish-plugins]"
+        echo "Usage: $0 [setup|install-guix|pull|reconfigure|patch-bashrc|fish-plugins]"
         echo ""
         echo "  setup          Full setup from scratch (default)"
         echo "  install-guix   Install Guix package manager (requires sudo)"
         echo "  pull           Update Guix"
         echo "  reconfigure    Apply Guix Home configuration"
+        echo "  patch-bashrc   Patch ~/.bashrc to source Guix Home profile"
         echo "  fish-plugins   Install fish shell plugins"
         exit 1
         ;;
