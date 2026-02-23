@@ -97,8 +97,29 @@ fish_plugins() {
     fish -c 'fisher update'
 }
 
+setup_swap() {
+    if swapon --show | grep -q /swapfile; then
+        echo "Swap already active on /swapfile, skipping."
+    else
+        echo "Creating 4G swapfile..."
+        sudo fallocate -l 4G /swapfile
+        sudo chmod 600 /swapfile
+        sudo mkswap /swapfile
+        sudo swapon /swapfile
+        echo "Swap enabled."
+    fi
+
+    if grep -q '/swapfile' /etc/fstab; then
+        echo "/swapfile already in /etc/fstab, skipping."
+    else
+        echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+        echo "Added /swapfile to /etc/fstab."
+    fi
+}
+
 case "${1:-setup}" in
     setup)
+        setup_swap
         install_guix
         pull
         reconfigure
@@ -108,6 +129,7 @@ case "${1:-setup}" in
         echo ""
         echo "Done! Log out and back in (or run 'source ~/.profile') to activate."
         ;;
+    setup-swap)        setup_swap ;;
     install-guix)      install_guix ;;
     pull)              pull ;;
     reconfigure)       reconfigure ;;
@@ -115,9 +137,10 @@ case "${1:-setup}" in
     patch-bashrc)      patch_bashrc ;;
     fish-plugins)      fish_plugins ;;
     *)
-        echo "Usage: $0 [setup|install-guix|pull|reconfigure|compile-terminfo|patch-bashrc|fish-plugins]"
+        echo "Usage: $0 [setup|setup-swap|install-guix|pull|reconfigure|compile-terminfo|patch-bashrc|fish-plugins]"
         echo ""
         echo "  setup             Full setup from scratch (default)"
+        echo "  setup-swap        Create 4G swapfile and persist to /etc/fstab (requires sudo)"
         echo "  install-guix      Install Guix package manager (requires sudo)"
         echo "  pull              Update Guix"
         echo "  reconfigure       Apply Guix Home configuration"

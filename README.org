@@ -10,12 +10,13 @@ git clone https://github.com/jaybonthius/dotfiles.git ~/dotfiles
 #+end_src
 
 This will:
-1. Install GNU Guix (requires sudo; prompts for confirmation)
-2. Authorize substitute servers (pre-built binaries)
-3. Run =guix pull= to fetch the latest Guix (slow on first run)
-4. Run =guix home reconfigure= to apply the home configuration
-5. Compile custom terminfo entries (for true 24-bit color in Emacs)
-6. Install fish shell plugins via fisher
+1. Create a 4GiB swapfile and persist it to =/etc/fstab= (requires sudo)
+2. Install GNU Guix (requires sudo; prompts for confirmation)
+3. Authorize substitute servers (pre-built binaries)
+4. Run =guix pull= to fetch the latest Guix (slow on first run)
+5. Run =guix home reconfigure= to apply the home configuration
+6. Compile custom terminfo entries (for true 24-bit color in Emacs)
+7. Install fish shell plugins via fisher
 
 After setup completes, log out and back in (or =source ~/.profile=) to
 activate the environment.
@@ -25,11 +26,43 @@ activate the environment.
 You can run each step independently:
 
 #+begin_src sh
+~/dotfiles/install.sh setup-swap          # Create 4G swapfile (requires sudo)
 ~/dotfiles/install.sh install-guix       # Install Guix package manager
 ~/dotfiles/install.sh pull               # Update Guix
 ~/dotfiles/install.sh reconfigure        # Apply home configuration
 ~/dotfiles/install.sh compile-terminfo   # Compile custom terminfo entries
 ~/dotfiles/install.sh fish-plugins       # Install fish shell plugins
+#+end_src
+
+* System Configuration
+
+** Swap
+
+Ubuntu EC2 instances ship with no swap. Without swap, memory overcommit causes
+the kernel to hard-freeze the machine (unresponsive, requires forced reboot)
+instead of killing the offending process. =install.sh= creates a 4GiB swapfile
+and persists it to =/etc/fstab= so it survives reboots.
+
+To set up swap independently:
+
+#+begin_src sh
+~/dotfiles/install.sh setup-swap
+#+end_src
+
+** earlyoom
+
+earlyoom is a userspace OOM killer. It monitors free memory and swap, and kills
+the process with the worst OOM score before the kernel's own OOM killer would
+act. This keeps the machine responsive under memory pressure instead of
+hard-freezing.
+
+It runs as a Shepherd service (managed by Guix Home) with default thresholds:
+kills when either free memory or free swap drops below 10%.
+
+To check its status:
+
+#+begin_src sh
+herd status earlyoom
 #+end_src
 
 * Git & SSH Setup

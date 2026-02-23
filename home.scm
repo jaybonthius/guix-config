@@ -4,9 +4,10 @@
              (gnu home services shepherd)
               (gnu packages emacs)
               (gnu packages fonts)
-              (gnu packages golang)
-              (gnu packages golang-apps)
-              (gnu packages python)
+               (gnu packages golang)
+               (gnu packages golang-apps)
+               (gnu packages linux)
+               (gnu packages python)
               (gnu packages racket)
               (gnu packages rust-apps)
              (gnu packages shells)
@@ -23,8 +24,9 @@
 
 (home-environment
  (packages
-    (list emacs-no-x
-          eza
+     (list emacs-no-x
+           earlyoom
+           eza
           fish
           font-fira-code
           fzf
@@ -90,6 +92,8 @@
                  (local-file "zellij/config.kdl"))
            (list "zellij/layouts/project.kdl"
                  (local-file "zellij/layouts/project.kdl"))
+            (list "zellij/layouts/copilot.kdl"
+                  (local-file "zellij/layouts/copilot.kdl"))
             (list "zellij/themes/modus_vivendi.kdl"
                   (local-file "zellij/themes/modus_vivendi.kdl"))
             (list "zellij/themes/modus_vivendi_deuteranopia.kdl"
@@ -126,5 +130,18 @@
                                          (string-append (getenv "HOME")
                                                         "/.local/state"))
                                      "/emacs-daemon.log")))
-            (stop #~(make-kill-destructor))))))))
+             (stop #~(make-kill-destructor)))))
+
+     ;; earlyoom: kill processes before kernel OOM to prevent hard freezes.
+     ;; Runs with defaults: triggers at 10% free memory or swap.
+     (simple-service
+      'earlyoom
+      home-shepherd-service-type
+      (list (shepherd-service
+             (provision '(earlyoom))
+             (documentation "Run earlyoom OOM killer daemon.")
+             (start #~(make-forkexec-constructor
+                       (list #$(file-append earlyoom "/bin/earlyoom"))))
+             (stop #~(make-kill-destructor))))))))
+
 
