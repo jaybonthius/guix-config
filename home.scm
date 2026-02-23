@@ -1,6 +1,7 @@
 (use-modules (gnu home)
              (gnu home services)
              (gnu home services shells)
+             (gnu home services shepherd)
               (gnu packages emacs)
               (gnu packages fonts)
               (gnu packages golang)
@@ -12,6 +13,7 @@
              (gnu packages shellutils)
              (gnu packages terminals)
              (gnu services)
+             (gnu services shepherd)
              (guix gexp)
              (minimal-emacs)
               (opencode)
@@ -106,5 +108,23 @@
                   (local-file "zellij/themes/modus_operandi_tritanopia.kdl"))
             (list "zellij/plugins/zjstatus.wasm"
                   (file-append zjstatus
-                               "/share/zjstatus/zjstatus.wasm")))))))
+                               "/share/zjstatus/zjstatus.wasm"))))
+
+    ;; Emacs daemon: single long-running instance managed by Shepherd.
+    ;; Connect with: emacsclient -t
+    (simple-service
+     'emacs-daemon
+     home-shepherd-service-type
+     (list (shepherd-service
+            (provision '(emacs-daemon))
+            (documentation "Run Emacs as a daemon.")
+            (start #~(make-forkexec-constructor
+                      (list #$(file-append emacs-no-x "/bin/emacs")
+                            "--fg-daemon")
+                      #:log-file
+                      (string-append (or (getenv "XDG_STATE_HOME")
+                                         (string-append (getenv "HOME")
+                                                        "/.local/state"))
+                                     "/emacs-daemon.log")))
+            (stop #~(make-kill-destructor))))))))
 

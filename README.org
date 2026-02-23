@@ -93,8 +93,16 @@ manually after editing the =.ti= file:
 ~/dotfiles/install.sh compile-terminfo
 #+end_src
 
-* Other thing
+* Other things
+
+Install basedpyright after uv
 
 #+begin_src sh
 uv tool install basedpyright
+#+end_src
+
+To reload your emacs config, use
+
+#+begin_src sh
+herd restart emacs-daemon
 #+end_src

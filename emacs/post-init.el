@@ -76,19 +76,6 @@ with clickable error locations."
 ;; Ask before quitting Emacs.
 (setq confirm-kill-emacs 'y-or-n-p)
 
-;; Start the Emacs server for emacsclient usage.
-;; Use EMACS_SESSION_NAME (set by zellij layout) as the server name so each
-;; session gets its own socket and avoids conflicts.
-(use-package server
-  :ensure nil
-  :defer t
-  :commands server-start
-  :hook (after-init . server-start)
-  :init
-  (when-let* ((name (getenv "EMACS_SESSION_NAME"))
-              (_ (not (string-empty-p name))))
-    (setq server-name name)))
-
 ;;; ============================================================================
 ;;; Built-in modes
 ;;; ============================================================================
@@ -1013,17 +1000,9 @@ recalculates margins for a new window geometry."
   (global-set-key (kbd "C-c e d") #'easysession-delete)
 
   ;; Load session after elpaca has installed easysession.
-  ;; If EMACS_SESSION_NAME is set, switch to that session (creating it
-  ;; if needed); otherwise load the last/default session.
   (add-hook 'elpaca-after-init-hook
             (lambda ()
-              (let ((env-session (getenv "EMACS_SESSION_NAME")))
-                (if (and env-session (not (string-empty-p env-session)))
-                    (progn
-                      (defvar easysession-confirm-new-session)
-                      (let ((easysession-confirm-new-session nil))
-                        (easysession-switch-to env-session)))
-                  (easysession-load-including-geometry)))
+              (easysession-load-including-geometry)
               (easysession-save-mode 1))
             95))
 

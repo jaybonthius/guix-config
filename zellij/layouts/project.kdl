@@ -1,7 +1,7 @@
 // Project layout for zellij
 // Usage: zellij -s <session-name> --layout project options --default-cwd /path/to/project
 //
-// Tab 1: emacs (EMACS_SESSION_NAME set from the zellij session name)
+// Tab 1: emacsclient connected to the Shepherd-managed Emacs daemon
 // Tab 2: terminal
 
 layout {
@@ -22,7 +22,7 @@ layout {
 
     tab name="editor" focus=true {
         pane command="bash" {
-            args "-c" "EMACS_SESSION_NAME=$ZELLIJ_SESSION_NAME exec emacs -nw"
+            args "-c" "exec emacsclient -t --alternate-editor=\"\""
         }
     }
 
