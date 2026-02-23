@@ -204,6 +204,11 @@ with clickable error locations."
   :ensure (:host github :repo "Bogdanp/twilight-anti-bright-theme")
   :demand t)
 
+;; gruvbox-theme: retro groove color scheme (dark & light variants).
+(use-package gruvbox-theme
+  :ensure t
+  :demand t)
+
 ;; modus-themes: highly accessible themes (WCAG AAA contrast).
 ;; modus-operandi (light) / modus-vivendi (dark).
 (use-package modus-themes
