@@ -1180,9 +1180,7 @@ Produces a line like: ;; Foo ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;"
 (add-hook 'racket-mode-hook #'jb-racket-mode-hook)
 (add-hook 'racket-mode-hook #'racket-xp-mode)
 (add-hook 'racket-hash-lang-mode-hook #'racket-xp-mode)
-(add-hook 'racket-mode-hook #'rainbow-delimiters-mode)
-(add-hook 'racket-hash-lang-mode-hook #'rainbow-delimiters-mode)
-(add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode)
+
 
 ;; Punct (.punct) markdown highlighting for racket-hash-lang-mode.
 ;;
@@ -1369,7 +1367,7 @@ racket-hash-lang-mode's token-based fontification."
 ;; rainbow-delimiters: colorize nested delimiters for visual depth cues.
 (use-package rainbow-delimiters
   :ensure t
-  :defer t)
+  :hook ((racket-mode racket-hash-lang-mode emacs-lisp-mode) . rainbow-delimiters-mode))
 
 ;; Flymake backend for raco review: lint Racket source files.
 (defvar-local jb-flymake-racket-review--proc nil
