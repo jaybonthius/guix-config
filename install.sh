@@ -74,6 +74,20 @@ patch_bashrc() {
     printf '\n# Guix Home\n[ -f ~/.profile ] && . ~/.profile\n' >> "$HOME/.bashrc"
 }
 
+compile_terminfo() {
+    echo "Compiling terminfo entries..."
+    if ! command -v tic >/dev/null 2>&1; then
+        echo "WARNING: tic not found, skipping terminfo compilation." >&2
+        echo "         Install ncurses (e.g. apt-get install ncurses-bin) and re-run." >&2
+        return
+    fi
+    tic -x -o "$HOME/.terminfo" "$DOTFILES_DIR/terminfo/xterm-ghostty.ti"
+    # Create ghostty symlink so TERM=ghostty also resolves
+    mkdir -p "$HOME/.terminfo/g"
+    ln -sf "../x/xterm-ghostty" "$HOME/.terminfo/g/ghostty"
+    echo "Terminfo compiled: xterm-ghostty (+ ghostty symlink)"
+}
+
 fish_plugins() {
     echo "Installing fish plugins..."
     source_guix_profile
@@ -88,25 +102,28 @@ case "${1:-setup}" in
         install_guix
         pull
         reconfigure
+        compile_terminfo
         patch_bashrc
         fish_plugins
         echo ""
         echo "Done! Log out and back in (or run 'source ~/.profile') to activate."
         ;;
-    install-guix)  install_guix ;;
-    pull)          pull ;;
-    reconfigure)   reconfigure ;;
-    patch-bashrc)  patch_bashrc ;;
-    fish-plugins)  fish_plugins ;;
+    install-guix)      install_guix ;;
+    pull)              pull ;;
+    reconfigure)       reconfigure ;;
+    compile-terminfo)  compile_terminfo ;;
+    patch-bashrc)      patch_bashrc ;;
+    fish-plugins)      fish_plugins ;;
     *)
-        echo "Usage: $0 [setup|install-guix|pull|reconfigure|patch-bashrc|fish-plugins]"
+        echo "Usage: $0 [setup|install-guix|pull|reconfigure|compile-terminfo|patch-bashrc|fish-plugins]"
         echo ""
-        echo "  setup          Full setup from scratch (default)"
-        echo "  install-guix   Install Guix package manager (requires sudo)"
-        echo "  pull           Update Guix"
-        echo "  reconfigure    Apply Guix Home configuration"
-        echo "  patch-bashrc   Patch ~/.bashrc to source Guix Home profile"
-        echo "  fish-plugins   Install fish shell plugins"
+        echo "  setup             Full setup from scratch (default)"
+        echo "  install-guix      Install Guix package manager (requires sudo)"
+        echo "  pull              Update Guix"
+        echo "  reconfigure       Apply Guix Home configuration"
+        echo "  compile-terminfo  Compile terminfo entries for Ghostty terminal"
+        echo "  patch-bashrc      Patch ~/.bashrc to source Guix Home profile"
+        echo "  fish-plugins      Install fish shell plugins"
         exit 1
         ;;
 esac

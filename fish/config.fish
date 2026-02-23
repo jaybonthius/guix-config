@@ -2,6 +2,12 @@ if status is-interactive
     # Commands to run in interactive sessions can go here
 end
 
+# Ensure COLORTERM is set for truecolor support in TUI apps (Emacs, etc.)
+# Ghostty supports truecolor but the env var gets lost over SSH hops.
+if not set -q COLORTERM
+    set -gx COLORTERM truecolor
+end
+
 # greeting
 function fish_greeting -d "What's up, fish?"
     set_color $fish_color_autosuggestion

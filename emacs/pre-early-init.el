@@ -28,4 +28,14 @@
 (setq user-emacs-directory (expand-file-name "var/" minimal-emacs-user-directory))
 (setq package-user-dir (expand-file-name "elpa" user-emacs-directory))
 
+;; Enable 24-bit (truecolor) support in terminal Emacs.
+;; Ghostty supports truecolor but the xterm-ghostty terminfo only
+;; advertises 256 colors.  Tell Emacs to use direct-color sequences
+;; when we know the terminal supports them.
+(unless (display-graphic-p)
+  (when (or (string= (getenv "COLORTERM") "truecolor")
+            (string= (getenv "COLORTERM") "24bit")
+            (string-prefix-p "xterm-ghostty" (or (getenv "TERM") "")))
+    (add-to-list 'term-file-aliases '("xterm-ghostty" . "xterm-direct"))))
+
 ;;; pre-early-init.el ends here

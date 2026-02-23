@@ -14,7 +14,8 @@ This will:
 2. Authorize substitute servers (pre-built binaries)
 3. Run =guix pull= to fetch the latest Guix (slow on first run)
 4. Run =guix home reconfigure= to apply the home configuration
-5. Install fish shell plugins via fisher
+5. Compile custom terminfo entries (for true 24-bit color in Emacs)
+6. Install fish shell plugins via fisher
 
 After setup completes, log out and back in (or =source ~/.profile=) to
 activate the environment.
@@ -24,10 +25,11 @@ activate the environment.
 You can run each step independently:
 
 #+begin_src sh
-~/dotfiles/install.sh install-guix    # Install Guix package manager
-~/dotfiles/install.sh pull            # Update Guix
-~/dotfiles/install.sh reconfigure     # Apply home configuration
-~/dotfiles/install.sh fish-plugins    # Install fish shell plugins
+~/dotfiles/install.sh install-guix       # Install Guix package manager
+~/dotfiles/install.sh pull               # Update Guix
+~/dotfiles/install.sh reconfigure        # Apply home configuration
+~/dotfiles/install.sh compile-terminfo   # Compile custom terminfo entries
+~/dotfiles/install.sh fish-plugins       # Install fish shell plugins
 #+end_src
 
 * Git & SSH Setup
@@ -67,6 +69,29 @@ After the home environment is configured, set up Git authentication:
    git remote set-url origin git@github.com:jaybonthius/dotfiles.git
    #+end_src
 
+
+* Terminfo & True Color
+
+Emacs in terminal mode (=emacs-no-x=) has a quirk in =term.c=: when
+rendering a color whose pixel value is less than 8 via the standard
+=setrgbf=/=setrgbb= terminfo path, it emits ANSI escape codes (e.g.
+=\e[30m=) instead of 24-bit RGB sequences (=\e[38;2;R;G;Bm=). This
+causes colors like =#000000= to be remapped to whatever the terminal
+has configured for ANSI black, breaking themes like modus-operandi
+that rely on exact foreground colors.
+
+The fix is adding =setf24=/=setb24= capabilities to the terminfo
+entry. Emacs checks for these first and uses unconditional
+colon-separated SGR sequences with no ANSI fallback. The custom entry
+lives in =terminfo/xterm-ghostty.ti= and is compiled into
+=~/.terminfo/= by =install.sh compile-terminfo=.
+
+This runs automatically during =install.sh setup=. To recompile
+manually after editing the =.ti= file:
+
+#+begin_src sh
+~/dotfiles/install.sh compile-terminfo
+#+end_src
 
 * Other thing
 
