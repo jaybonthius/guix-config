@@ -88,6 +88,23 @@
                  (local-file "zellij/config.kdl"))
            (list "zellij/layouts/project.kdl"
                  (local-file "zellij/layouts/project.kdl"))
-           (list "zellij/plugins/zjstatus.wasm"
-                 (file-append zjstatus
-                              "/share/zjstatus/zjstatus.wasm")))))))
+            (list "zellij/themes/modus_vivendi.kdl"
+                  (local-file "zellij/themes/modus_vivendi.kdl"))
+            (list "zellij/themes/modus_vivendi_deuteranopia.kdl"
+                  (local-file "zellij/themes/modus_vivendi_deuteranopia.kdl"))
+            (list "zellij/themes/modus_vivendi_tinted.kdl"
+                  (local-file "zellij/themes/modus_vivendi_tinted.kdl"))
+            (list "zellij/themes/modus_vivendi_tritanopia.kdl"
+                  (local-file "zellij/themes/modus_vivendi_tritanopia.kdl"))
+            (list "zellij/themes/modus_operandi.kdl"
+                  (local-file "zellij/themes/modus_operandi.kdl"))
+            (list "zellij/themes/modus_operandi_deuteranopia.kdl"
+                  (local-file "zellij/themes/modus_operandi_deuteranopia.kdl"))
+            (list "zellij/themes/modus_operandi_tinted.kdl"
+                  (local-file "zellij/themes/modus_operandi_tinted.kdl"))
+            (list "zellij/themes/modus_operandi_tritanopia.kdl"
+                  (local-file "zellij/themes/modus_operandi_tritanopia.kdl"))
+            (list "zellij/plugins/zjstatus.wasm"
+                  (file-append zjstatus
+                               "/share/zjstatus/zjstatus.wasm")))))))
+
