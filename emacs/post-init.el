@@ -204,6 +204,26 @@ with clickable error locations."
   :ensure (:host github :repo "Bogdanp/twilight-anti-bright-theme")
   :demand t)
 
+;; modus-themes: highly accessible themes (WCAG AAA contrast).
+;; modus-operandi (light) / modus-vivendi (dark).
+(use-package modus-themes
+  :ensure t
+  :demand t
+  :bind (("<f5>" . modus-themes-toggle))
+  :custom
+  (modus-themes-to-toggle '(modus-operandi modus-vivendi))
+  (modus-themes-italic-constructs t)
+  (modus-themes-bold-constructs t)
+  (modus-themes-mixed-fonts t)
+  (modus-themes-headings
+   '((1 . (1.3))
+     (2 . (1.2))
+     (3 . (1.1))
+     (t . (1.0))))
+  (modus-themes-completions '((matches . (bold))
+                              (selection . (semibold))))
+  (modus-themes-prompts '(bold)))
+
 ;; Remember theme: persist the last-used theme across sessions.
 ;; On quit, the current theme name is saved to ~/.emacs-theme.
 ;; On startup, that theme is restored (defaulting to twilight-anti-bright).
@@ -242,6 +262,8 @@ with clickable error locations."
 (add-hook 'elpaca-after-init-hook #'jb-load-remembered-theme)
 ;; Save theme on quit.
 (add-hook 'kill-emacs-hook #'jb-save-theme)
+;; Persist modus theme switches through the remember-theme system.
+(advice-add 'modus-themes-toggle :after (lambda (&rest _) (jb-save-theme)))
 
 ;;; Ligatures
 
@@ -1148,23 +1170,7 @@ recalculates margins for a new window geometry."
          ("README\\.md\\'" . gfm-mode))
   :bind
   (:map markdown-mode-map
-        ("C-c C-e" . markdown-do))
-  :custom-face
-  ;; Per-level heading colors: warm→cool rainbow using twilight palette.
-  ;; Colors only (no height scaling) — works for both light and dark themes.
-  ;; Light values from twilight-bright, dark values from twilight-anti-bright.
-  (markdown-header-face-1 ((((background light)) :foreground "#d15120" :weight bold)
-                           (((background dark))  :foreground "#d15120" :weight bold)))
-  (markdown-header-face-2 ((((background light)) :foreground "#cf7900" :weight bold)
-                           (((background dark))  :foreground "#d97a35" :weight bold)))
-  (markdown-header-face-3 ((((background light)) :foreground "#d2ad00" :weight bold)
-                           (((background dark))  :foreground "#deae3e" :weight bold)))
-  (markdown-header-face-4 ((((background light)) :foreground "#5f9411" :weight bold)
-                           (((background dark))  :foreground "#81af34" :weight bold)))
-  (markdown-header-face-5 ((((background light)) :foreground "#417598" :weight bold)
-                           (((background dark))  :foreground "#7e9fc9" :weight bold)))
-  (markdown-header-face-6 ((((background light)) :foreground "#a66bab" :weight bold)
-                           (((background dark))  :foreground "#a878b5" :weight bold))))
+        ("C-c C-e" . markdown-do)))
 
 ;;; Racket
 
