@@ -5,7 +5,7 @@
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (gnu packages rust-apps))
 
-(define %version "1.2.10")
+(define %version "1.1.12")
 
 (define-public opencode
   (package
@@ -24,8 +24,8 @@
        (sha256
         (base32
          (if (string=? (%current-system) "aarch64-linux")
-             "0xbpgc5ny787qi03kzaapxr5lxck0pl4d20fihjldlhypkqd9afr"
-             "0n5356vb77dmkvdgik7vxhar2hlwiv430r21sw87n1lg5q0j9k7b")))))
+             "05dskc1n749yzx0lvb72269j9azz8g97zajlrfx8pyfjsgacprbc"
+             "008fzni0yhxmphsqxsrzy451sq6gnq6pxihsa3svq6pmnh2nw8bs")))))
     (build-system copy-build-system)
     (arguments
      '(#:install-plan '(("opencode" "bin/opencode"))
