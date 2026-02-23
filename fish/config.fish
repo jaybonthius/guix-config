@@ -8,6 +8,13 @@ if not set -q COLORTERM
     set -gx COLORTERM truecolor
 end
 
+# Ensure TERM uses the xterm-ghostty terminfo entry when it gets stripped to the
+# generic xterm-color (e.g. Lima's sshd doesn't AcceptEnv TERM by default).
+# Only activates when the compiled entry actually exists.
+if test "$TERM" = "xterm-color" && infocmp xterm-ghostty >/dev/null 2>&1
+    set -gx TERM xterm-ghostty
+end
+
 # greeting
 function fish_greeting -d "What's up, fish?"
     set_color $fish_color_autosuggestion
