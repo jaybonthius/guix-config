@@ -3,6 +3,19 @@
                          :depth treeless :host sourcehut :repo
                          "ashton314/auto-olivetti" :package "auto-olivetti" :ref
                          "406b2fca6b320f323d6d2f96240bc4c8551c12a9"))
+ (autothemer :source "elpaca-menu-lock-file" :recipe
+             (:package "autothemer" :fetcher github :repo "jasonm23/autothemer"
+                       :files
+                       ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo"
+                        "doc/dir" "doc/*.info" "doc/*.texi" "doc/*.texinfo"
+                        "lisp/*.el" "docs/dir" "docs/*.info" "docs/*.texi"
+                        "docs/*.texinfo"
+                        (:exclude ".dir-locals.el" "test.el" "tests.el"
+                                  "*-test.el" "*-tests.el" "LICENSE" "README*"
+                                  "*-pkg.el"))
+                       :source "elpaca-menu-lock-file" :protocol https :inherit
+                       t :depth treeless :ref
+                       "e62bf83414abd8b1cefafb7480612faa30ed7878"))
  (avy :source "elpaca-menu-lock-file" :recipe
       (:package "avy" :repo "abo-abo/avy" :fetcher github :files
                 ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo" "doc/dir"
@@ -164,7 +177,7 @@
                         (:defaults "extensions/easysession*.el") :source
                         "elpaca-menu-lock-file" :protocol https :inherit t
                         :depth treeless :ref
-                        "bf2a989c8d990396784ae7e2a38ef9943465a967"))
+                        "6198a7b212284600d24a72ff09b911b4f67217da"))
  (elisp-refs :source "elpaca-menu-lock-file" :recipe
              (:package "elisp-refs" :repo "Wilfred/elisp-refs" :fetcher github
                        :files (:defaults (:exclude "elisp-refs-bench.el"))
@@ -175,7 +188,7 @@
    "elpaca-menu-lock-file" :recipe
    (:source nil :protocol https :inherit ignore :depth 1 :repo
             "https://github.com/progfolio/elpaca.git" :ref
-            "1508298c1ed19c81fa4ebc5d22d945322e9e4c52" :files
+            "5aa857acaa822f5190e16cc636df9c63b0c182cc" :files
             (:defaults "elpaca-test.el" (:exclude "extensions")) :build
             (:not elpaca--activate-package) :package "elpaca"))
  (elpaca-use-package :source "elpaca-menu-lock-file" :recipe
@@ -186,7 +199,7 @@
                                (:not elpaca--compile-info) :source
                                "Elpaca extensions" :protocol https :inherit t
                                :depth treeless :ref
-                               "1508298c1ed19c81fa4ebc5d22d945322e9e4c52"))
+                               "5aa857acaa822f5190e16cc636df9c63b0c182cc"))
  (embark :source "elpaca-menu-lock-file" :recipe
          (:package "embark" :repo "oantolin/embark" :fetcher github :files
                    ("embark.el" "embark-org.el" "embark.texi") :source
@@ -232,6 +245,19 @@
                   :source "elpaca-menu-lock-file" :protocol https :inherit t
                   :depth treeless :host github :ref
                   "407e3b345c935b931b7c2f9ee2ad525f8bc63432"))
+ (gruvbox-theme :source "elpaca-menu-lock-file" :recipe
+                (:package "gruvbox-theme" :fetcher github :repo
+                          "greduan/emacs-theme-gruvbox" :files
+                          ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo"
+                           "doc/dir" "doc/*.info" "doc/*.texi" "doc/*.texinfo"
+                           "lisp/*.el" "docs/dir" "docs/*.info" "docs/*.texi"
+                           "docs/*.texinfo"
+                           (:exclude ".dir-locals.el" "test.el" "tests.el"
+                                     "*-test.el" "*-tests.el" "LICENSE"
+                                     "README*" "*-pkg.el"))
+                          :source "elpaca-menu-lock-file" :protocol https
+                          :inherit t :depth treeless :ref
+                          "6cbf80b6cde3c2390502dc94a911ab7378495249"))
  (hcl-mode :source "elpaca-menu-lock-file" :recipe
            (:package "hcl-mode" :repo "hcl-emacs/hcl-mode" :fetcher github
                      :files
@@ -383,6 +409,19 @@
                  :source "elpaca-menu-lock-file" :protocol https :inherit t
                  :depth treeless :host github :ref
                  "2246f593552c6208bac533de9af04b085fafa6fa"))
+ (modus-themes :source "elpaca-menu-lock-file" :recipe
+               (:package "modus-themes" :fetcher github :repo
+                         "protesilaos/modus-themes" :files
+                         ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo"
+                          "doc/dir" "doc/*.info" "doc/*.texi" "doc/*.texinfo"
+                          "lisp/*.el" "docs/dir" "docs/*.info" "docs/*.texi"
+                          "docs/*.texinfo"
+                          (:exclude ".dir-locals.el" "test.el" "tests.el"
+                                    "*-test.el" "*-tests.el" "LICENSE" "README*"
+                                    "*-pkg.el"))
+                         :source "elpaca-menu-lock-file" :protocol https
+                         :inherit t :depth treeless :ref
+                         "ecd696daf874894c545265f0a8c0686550eb1e33"))
  (olivetti :source "elpaca-menu-lock-file" :recipe
            (:package "olivetti" :fetcher github :repo "rnkn/olivetti" :files
                      ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo"
@@ -597,7 +636,7 @@
                                   :source "elpaca-menu-lock-file" :protocol
                                   https :inherit t :depth treeless :host github
                                   :ref
-                                  "322157cb2f3bf7920ecd209dafc31bc1c7959f49"))
+                                  "ffca0f5ae10ccfc3a2efcd50c7fe2f084eb34be6"))
  (typst-preview :source "elpaca-menu-lock-file" :recipe
                 (:package "typst-preview" :fetcher github :repo
                           "havarddj/typst-preview.el" :files

@@ -55,7 +55,7 @@
 ;; so setting elpaca-lock-file is all that's needed for Elpaca to use it.
 ;; Patterns below follow jimeh/.emacs.d (author of Elpaca PR #504).
 
-(setq elpaca-lock-file (expand-file-name "elpaca-lock.el" minimal-emacs-user-directory))
+(setq elpaca-lock-file (expand-file-name "~/dotfiles/emacs/elpaca-lock.el"))
 
 ;; Auto-write lock file after all packages are installed on startup.
 ;; Keeps the lock file in sync without manual intervention.
