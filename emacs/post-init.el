@@ -967,7 +967,9 @@ recalculates margins for a new window geometry."
   :ensure t
   :commands (easysession-switch-to
              easysession-save-mode
-             easysession-load-including-geometry)
+             easysession-load
+             easysession-load-including-geometry
+             easysession-set-current-session-name)
 
   :custom
   (easysession-mode-line-misc-info t)    ; Display session name in modeline
@@ -999,10 +1001,45 @@ recalculates margins for a new window geometry."
   (global-set-key (kbd "C-c e R") #'easysession-reset)
   (global-set-key (kbd "C-c e d") #'easysession-delete)
 
-  ;; Load session after elpaca has installed easysession.
+  ;; Zellij integration: switch easysession to match the active Zellij session.
+  ;; Called by the zellij-emacs-session WASM plugin via `emacsclient --eval`,
+  ;; or by `jb-zellij-initial-session-setup' on the first emacsclient frame.
+  (defun jb-zellij-switch-session (session-name)
+    "Switch easysession to SESSION-NAME for Zellij integration.
+Does nothing if SESSION-NAME is already the current session."
+    (when (and (fboundp 'easysession-switch-to)
+               (bound-and-true-p easysession--current-session-name)
+               (not (string= easysession--current-session-name session-name)))
+      (let ((easysession-confirm-new-session nil))
+        (easysession-switch-to session-name))))
+
+  ;; Defer session loading: don't load a session at daemon startup.
+  ;; Instead, the first emacsclient connection determines which session
+  ;; to load based on its ZELLIJ_SESSION_NAME environment variable.
+  (defun jb-zellij-initial-session-setup ()
+    "Load easysession matching the Zellij session on first emacsclient frame.
+On subsequent frames, switch to the correct session if it differs."
+    (when-let* ((frame (selected-frame))
+                (env (frame-parameter frame 'environment))
+                (zellij-session (getenv-internal "ZELLIJ_SESSION_NAME" env)))
+      (when (not (string-empty-p zellij-session))
+        (cond
+         ;; First load: no session loaded yet, load directly.
+         ((null easysession--current-session-name)
+          (let ((easysession-confirm-new-session nil))
+            (easysession-load zellij-session)
+            (easysession-set-current-session-name zellij-session)))
+         ;; Session already loaded but different: switch.
+         ((not (string= easysession--current-session-name zellij-session))
+          (jb-zellij-switch-session zellij-session))))))
+
+  (add-hook 'server-after-make-frame-hook #'jb-zellij-initial-session-setup)
+
+  ;; Start save-mode after elpaca finishes installing easysession, but don't
+  ;; load a session yet -- the first emacsclient frame will determine which
+  ;; session to load via ZELLIJ_SESSION_NAME.
   (add-hook 'elpaca-after-init-hook
             (lambda ()
-              (easysession-load-including-geometry)
               (easysession-save-mode 1))
             95))
 

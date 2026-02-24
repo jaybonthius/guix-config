@@ -35,6 +35,12 @@ plugins {
     filepicker location="zellij:strider" {
         cwd "/"
     }
+    emacs-session location="file:~/.config/zellij/plugins/zellij-emacs-session.wasm"
+}
+
+// Background plugins loaded on session start
+load_plugins {
+    emacs-session
 }
 
 // --- Keybindings ---

@@ -112,7 +112,10 @@
                   (local-file "zellij/themes/modus_operandi_tritanopia.kdl"))
             (list "zellij/plugins/zjstatus.wasm"
                   (file-append zjstatus
-                               "/share/zjstatus/zjstatus.wasm"))))
+                               "/share/zjstatus/zjstatus.wasm"))
+            (list "zellij/plugins/zellij-emacs-session.wasm"
+                  (local-file
+                   "zellij-emacs-session/zellij-emacs-session.wasm"))))
 
     ;; Emacs daemon: single long-running instance managed by Shepherd.
     ;; Connect with: emacsclient -t
