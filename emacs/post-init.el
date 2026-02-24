@@ -987,6 +987,20 @@ recalculates margins for a new window geometry."
         (easysession-switch-to easysession-previous-session)
       (user-error "No previous session")))
 
+  (defun jb-easysession-delete-all ()
+    "Delete all easysession sessions, including the current one."
+    (interactive)
+    ;; Unload saves the current session then clears in-memory state.
+    (easysession-unload)
+    (let ((sessions (easysession--get-all-names)))
+      (unless sessions
+        (user-error "No easysession sessions found"))
+      (when (yes-or-no-p
+             (format "Delete ALL %d easysession sessions? " (length sessions)))
+        (easysession-delete sessions)
+        (setq easysession-previous-session nil)
+        (message "Deleted %d easysession sessions." (length sessions)))))
+
   (define-advice easysession-switch-to (:before (&rest _) track-previous)
     "Stash current session name before switching."
     (when (bound-and-true-p easysession--current-session-name)
@@ -1000,6 +1014,7 @@ recalculates margins for a new window geometry."
   (global-set-key (kbd "C-c e r") #'easysession-rename)
   (global-set-key (kbd "C-c e R") #'easysession-reset)
   (global-set-key (kbd "C-c e d") #'easysession-delete)
+  (global-set-key (kbd "C-c e D") #'jb-easysession-delete-all)
 
   ;; Zellij integration: switch easysession to match the active Zellij session.
   ;; Called by the zellij-emacs-session WASM plugin via `emacsclient --eval`,
@@ -1008,8 +1023,8 @@ recalculates margins for a new window geometry."
     "Switch easysession to SESSION-NAME for Zellij integration.
 Does nothing if SESSION-NAME is already the current session."
     (when (and (fboundp 'easysession-switch-to)
-               (bound-and-true-p easysession--current-session-name)
-               (not (string= easysession--current-session-name session-name)))
+               (not (string= (or easysession--current-session-name "")
+                              session-name)))
       (let ((easysession-confirm-new-session nil))
         (easysession-switch-to session-name))))
 
