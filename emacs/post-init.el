@@ -987,16 +987,18 @@ recalculates margins for a new window geometry."
         (easysession-switch-to easysession-previous-session)
       (user-error "No previous session")))
 
-  (defun jb-easysession-delete-all ()
-    "Delete all easysession sessions, including the current one."
+  (defun jb-easysession-delete-all (&optional force)
+    "Delete all easysession sessions, including the current one.
+When FORCE is non-nil, skip the confirmation prompt."
     (interactive)
     ;; Unload saves the current session then clears in-memory state.
     (easysession-unload)
     (let ((sessions (easysession--get-all-names)))
       (unless sessions
         (user-error "No easysession sessions found"))
-      (when (yes-or-no-p
-             (format "Delete ALL %d easysession sessions? " (length sessions)))
+      (when (or force
+                (yes-or-no-p
+                 (format "Delete ALL %d easysession sessions? " (length sessions))))
         (easysession-delete sessions)
         (setq easysession-previous-session nil)
         (message "Deleted %d easysession sessions." (length sessions)))))
