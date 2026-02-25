@@ -1078,6 +1078,19 @@ Does nothing if SESSION-NAME is already the current session."
 
   (add-hook 'server-after-make-frame-hook #'jb-zellij-initial-session-setup)
 
+  (defun jb-restart-emacs-daemon ()
+    "Save the current easysession and restart the Emacs daemon via Shepherd.
+Uses `start-process' so the restart is asynchronous -- Shepherd kills
+this Emacs process and starts a fresh one.  The Zellij editor pane's
+while-loop will automatically reconnect once the new daemon is up."
+    (interactive)
+    (when (y-or-n-p "Restart Emacs daemon? All frames will be closed. ")
+      (when (bound-and-true-p easysession--current-session-name)
+        (easysession-save))
+      (start-process "restart-emacs" nil "herd" "restart" "emacs-daemon")))
+
+  (global-set-key (kbd "C-c g d") #'jb-restart-emacs-daemon)
+
   ;; Start save-mode after elpaca finishes installing easysession, but don't
   ;; load a session yet -- the first emacsclient frame will determine which
   ;; session to load via ZELLIJ_SESSION_NAME.
