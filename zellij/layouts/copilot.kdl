@@ -22,8 +22,17 @@ layout {
     }
 
     tab name="editor" focus=true {
+        // emacsclient connects to the Shepherd-managed Emacs daemon.
+        // Tagged with the Zellij session name via -F so the WASM plugin
+        // can surgically kill this specific frame on session switch.
+        //
+        // Gated startup loop: before connecting, checks
+        // ~/.local/state/zellij-emacs-session to see if THIS session is
+        // the active one. On session switch the WASM plugin writes "NONE"
+        // to the gate file first (blocking all loops), kills old clients,
+        // then writes the new session name so only the correct loop proceeds.
         pane command="bash" {
-            args "-c" "exec emacsclient -t --alternate-editor=\"\""
+            args "-c" "while true; do while [ \"$(cat ~/.local/state/zellij-emacs-session 2>/dev/null)\" != \"$ZELLIJ_SESSION_NAME\" ]; do sleep 0.1; done; emacsclient -t -F '((zellij-session . \"'\"$ZELLIJ_SESSION_NAME\"'\"))' --alternate-editor=''; done"
         }
     }
 

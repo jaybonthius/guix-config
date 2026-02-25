@@ -1018,36 +1018,59 @@ When FORCE is non-nil, skip the confirmation prompt."
   (global-set-key (kbd "C-c e d") #'easysession-delete)
   (global-set-key (kbd "C-c e D") #'jb-easysession-delete-all)
 
-  ;; Zellij integration: switch easysession to match the active Zellij session.
-  ;; Called by the zellij-emacs-session WASM plugin via `emacsclient --eval`,
-  ;; or by `jb-zellij-initial-session-setup' on the first emacsclient frame.
+  ;; Zellij integration: when switching Zellij sessions, kill all
+  ;; emacsclient frames so only one client is ever active.
+  ;; The new session's emacsclient reconnects via a gated while-loop
+  ;; in the Zellij layout and triggers `jb-zellij-initial-session-setup'.
+
+  (defun jb-zellij-save-and-kill-clients ()
+    "Save current easysession and kill all client frames.
+Called by the Zellij WASM plugin when switching away from a session.
+The plugin handles the gate file write after this returns."
+    (when (bound-and-true-p easysession--current-session-name)
+      (easysession-save))
+    (dolist (frame (frame-list))
+      (when-let ((proc (frame-parameter frame 'client)))
+        (server-delete-client proc))))
+
   (defun jb-zellij-switch-session (session-name)
     "Switch easysession to SESSION-NAME for Zellij integration.
 Does nothing if SESSION-NAME is already the current session."
     (when (and (fboundp 'easysession-switch-to)
                (not (string= (or easysession--current-session-name "")
-                              session-name)))
+                               session-name)))
       (let ((easysession-confirm-new-session nil))
-        (easysession-switch-to session-name))))
+        (easysession-switch-to session-name))
+      ;; easysession-load doesn't set session-loaded for new sessions
+      ;; that have no file on disk yet. Force it so easysession-save works.
+      (unless easysession--session-loaded
+        (setq easysession--session-loaded t))))
 
   ;; Defer session loading: don't load a session at daemon startup.
   ;; Instead, the first emacsclient connection determines which session
-  ;; to load based on its ZELLIJ_SESSION_NAME environment variable.
+  ;; to load based on its zellij-session frame parameter (set via -F)
+  ;; or ZELLIJ_SESSION_NAME environment variable.
   (defun jb-zellij-initial-session-setup ()
-    "Load easysession matching the Zellij session on first emacsclient frame.
-On subsequent frames, switch to the correct session if it differs."
+    "Load easysession matching the Zellij session on emacsclient frame connect."
     (when-let* ((frame (selected-frame))
-                (env (frame-parameter frame 'environment))
-                (zellij-session (getenv-internal "ZELLIJ_SESSION_NAME" env)))
+                (zellij-session
+                 (or (frame-parameter frame 'zellij-session)
+                     (let ((env (frame-parameter frame 'environment)))
+                       (getenv-internal "ZELLIJ_SESSION_NAME" env)))))
       (when (not (string-empty-p zellij-session))
         (cond
-         ;; First load: no session loaded yet, load directly.
+         ;; No session loaded yet: fresh load.
          ((null easysession--current-session-name)
           (let ((easysession-confirm-new-session nil))
             (easysession-load zellij-session)
-            (easysession-set-current-session-name zellij-session)))
-         ;; Session already loaded but different: switch.
-         ((not (string= easysession--current-session-name zellij-session))
+            (easysession-set-current-session-name zellij-session)
+            (setq easysession--session-loaded t)
+            (easysession-save)))
+         ;; Same session: do nothing.
+         ((string= easysession--current-session-name zellij-session)
+          nil)
+         ;; Different session: switch to it.
+         (t
           (jb-zellij-switch-session zellij-session))))))
 
   (add-hook 'server-after-make-frame-hook #'jb-zellij-initial-session-setup)

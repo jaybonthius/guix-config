@@ -1,12 +1,43 @@
 # zellij-emacs-session
 
-Zellij WASM plugin that automatically syncs the Emacs daemon's
-[easysession](https://github.com/jamescherti/easysession.el) to match the
-active Zellij session.
+Zellij WASM plugin that coordinates a single Emacs daemon across multiple
+Zellij sessions using [easysession](https://github.com/jamescherti/easysession.el).
 
-When you switch Zellij sessions, the plugin detects the change and calls
-`emacsclient --eval '(jb-zellij-switch-session "session-name")'` to save the
-current easysession and load the one matching the new Zellij session.
+When you switch Zellij sessions, the plugin saves the current easysession,
+kills all emacsclient frames, and opens a gate file so only the target
+session's editor pane can reconnect.
+
+## How it works
+
+A single Emacs daemon serves all Zellij sessions.  Each session's layout has
+an editor pane running a gated while-loop that polls a **gate file**
+(`~/.local/state/zellij-emacs-session`) and only launches `emacsclient` when
+the file contains that session's name.
+
+On session switch the plugin runs three steps sequentially in one bash
+invocation:
+
+1. **Write `NONE`** to the gate file -- immediately blocks every session's
+   while-loop from passing the gate check.
+2. **`emacsclient --eval '(jb-zellij-save-and-kill-clients)'`** -- saves the
+   current easysession and kills all client frames.
+3. **Write the new session name** to the gate file -- only the matching
+   session's loop proceeds and launches `emacsclient`.
+
+The new `emacsclient` frame carries a `zellij-session` frame parameter (set
+via `-F`).  On connect, `jb-zellij-initial-session-setup` (on
+`server-after-make-frame-hook`) reads that parameter and loads / switches to
+the corresponding easysession.
+
+### Known limitations
+
+- Each Zellij session runs its own WASM plugin instance with independent
+  state.  The plugin deduplicates `SessionUpdate` events using an in-memory
+  `current_session` field, but this resets if Zellij restarts the plugin.
+  When that happens the plugin runs a redundant save-kill-gate cycle that
+  causes a brief emacsclient reconnect flicker but no data loss.
+- Inactive sessions' editor panes poll the gate file every 100 ms.  This is
+  cheap but not zero-cost.
 
 ## Prerequisites
 
