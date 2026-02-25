@@ -62,10 +62,18 @@ impl ZellijPlugin for EmacsSessionSwitcher {
 /// Save the current easysession, kill all client frames, then open the
 /// gate for the new session.  All steps run sequentially in a single bash
 /// invocation to guarantee ordering.
+///
+/// The command is idempotent: if the gate file already contains the target
+/// session name, it exits immediately without killing anything.  This
+/// avoids a redundant kill+reconnect cycle when a fresh plugin instance
+/// fires for a session that is already active (each Zellij session runs
+/// its own plugin instance with independent in-memory state).
 fn switch_emacs_session(new_session_name: &str) {
     let new_esc = new_session_name.replace('\'', "'\\''");
     let cmd = format!(
-        "mkdir -p ~/.local/state && \
+        "current=$(cat {GATE} 2>/dev/null) && \
+         [ \"$current\" = '{NAME}' ] && exit 0; \
+         mkdir -p ~/.local/state && \
          printf '%s' 'NONE' > {GATE} && \
          emacsclient --eval '(jb-zellij-save-and-kill-clients)' >/dev/null 2>&1 && \
          printf '%s' '{NAME}' > {GATE}",
