@@ -32,7 +32,7 @@ layout {
         // to the gate file first (blocking all loops), kills old clients,
         // then writes the new session name so only the correct loop proceeds.
         pane command="bash" {
-            args "-c" "while true; do while [ \"$(cat ~/.local/state/zellij-emacs-session 2>/dev/null)\" != \"$ZELLIJ_SESSION_NAME\" ]; do sleep 0.1; done; emacsclient -t -F '((zellij-session . \"'\"$ZELLIJ_SESSION_NAME\"'\"))' --alternate-editor=''; done"
+            args "-c" "while true; do while [ \"$(cat ~/.local/state/zellij-emacs-session 2>/dev/null)\" != \"$ZELLIJ_SESSION_NAME\" ]; do sleep 0.1; done; emacsclient -t -F '((zellij-session . \"'\"$ZELLIJ_SESSION_NAME\"'\"))'; done"
         }
     }
 
