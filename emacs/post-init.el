@@ -1036,15 +1036,16 @@ The plugin handles the gate file write after this returns."
   (defun jb-zellij-switch-session (session-name)
     "Switch easysession to SESSION-NAME for Zellij integration.
 Does nothing if SESSION-NAME is already the current session."
-    (when (and (fboundp 'easysession-switch-to)
-               (not (string= (or easysession--current-session-name "")
-                               session-name)))
-      (let ((easysession-confirm-new-session nil))
-        (easysession-switch-to session-name))
-      ;; easysession-load doesn't set session-loaded for new sessions
-      ;; that have no file on disk yet. Force it so easysession-save works.
-      (unless easysession--session-loaded
-        (setq easysession--session-loaded t))))
+    (let ((current (and (boundp 'easysession--current-session-name)
+                        easysession--current-session-name)))
+      (when (and (fboundp 'easysession-switch-to)
+                 (not (string= (or current "") session-name)))
+        (let ((easysession-confirm-new-session nil))
+          (easysession-switch-to session-name))
+        ;; easysession-load doesn't set session-loaded for new sessions
+        ;; that have no file on disk yet. Force it so easysession-save works.
+        (when (not (bound-and-true-p easysession--session-loaded))
+          (setq easysession--session-loaded t)))))
 
   ;; Defer session loading: don't load a session at daemon startup.
   ;; Instead, the first emacsclient connection determines which session
@@ -1057,21 +1058,23 @@ Does nothing if SESSION-NAME is already the current session."
                  (or (frame-parameter frame 'zellij-session)
                      (let ((env (frame-parameter frame 'environment)))
                        (getenv-internal "ZELLIJ_SESSION_NAME" env)))))
-      (when (not (string-empty-p zellij-session))
-        (cond
-         ;; No session loaded yet: fresh load.
-         ((null easysession--current-session-name)
-          (let ((easysession-confirm-new-session nil))
-            (easysession-load zellij-session)
-            (easysession-set-current-session-name zellij-session)
-            (setq easysession--session-loaded t)
-            (easysession-save)))
-         ;; Same session: do nothing.
-         ((string= easysession--current-session-name zellij-session)
-          nil)
-         ;; Different session: switch to it.
-         (t
-          (jb-zellij-switch-session zellij-session))))))
+      (let ((current (and (boundp 'easysession--current-session-name)
+                          easysession--current-session-name)))
+        (when (not (string-empty-p zellij-session))
+          (cond
+           ;; No session loaded yet: fresh load.
+           ((null current)
+            (let ((easysession-confirm-new-session nil))
+              (easysession-load zellij-session)
+              (easysession-set-current-session-name zellij-session)
+              (setq easysession--session-loaded t)
+              (easysession-save)))
+           ;; Same session: do nothing.
+           ((string= current zellij-session)
+            nil)
+           ;; Different session: switch to it.
+           (t
+            (jb-zellij-switch-session zellij-session)))))))
 
   (add-hook 'server-after-make-frame-hook #'jb-zellij-initial-session-setup)
 
