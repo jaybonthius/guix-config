@@ -55,6 +55,8 @@
     home-xdg-configuration-files-service-type
     (list (list "fish/functions/fisher.fish"
                 (local-file "fish/functions/fisher.fish"))
+          (list "fish/functions/zlast.fish"
+                (local-file "fish/functions/zlast.fish"))
           (list "fish/fish_plugins"
                 (local-file "fish/fish_plugins"))))
 
