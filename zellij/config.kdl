@@ -44,7 +44,7 @@ load_plugins {
 }
 
 // --- Keybindings ---
-// Super+t/j/l/s/k/e/o work directly from locked mode (no prefix).
+// Super+t/arrows/1-9/s/k work directly from locked mode (no prefix).
 // Super+r enters command mode for everything else.
 // All actions return to locked mode so keystrokes always go to the terminal.
 
@@ -54,8 +54,17 @@ keybinds clear-defaults=true {
     locked {
         bind "Super r" { SwitchToMode "normal"; }
         bind "Super t" { NewTab; SwitchToMode "locked"; }
-        bind "Super j" { GoToPreviousTab; SwitchToMode "locked"; }
-        bind "Super l" { GoToNextTab; SwitchToMode "locked"; }
+        bind "Super left" { GoToPreviousTab; SwitchToMode "locked"; }
+        bind "Super right" { GoToNextTab; SwitchToMode "locked"; }
+        bind "Super 1" { GoToTab 1; SwitchToMode "locked"; }
+        bind "Super 2" { GoToTab 2; SwitchToMode "locked"; }
+        bind "Super 3" { GoToTab 3; SwitchToMode "locked"; }
+        bind "Super 4" { GoToTab 4; SwitchToMode "locked"; }
+        bind "Super 5" { GoToTab 5; SwitchToMode "locked"; }
+        bind "Super 6" { GoToTab 6; SwitchToMode "locked"; }
+        bind "Super 7" { GoToTab 7; SwitchToMode "locked"; }
+        bind "Super 8" { GoToTab 8; SwitchToMode "locked"; }
+        bind "Super 9" { GoToTab 9; SwitchToMode "locked"; }
         bind "Super s" {
             LaunchOrFocusPlugin "session-manager" {
                 floating true
@@ -64,8 +73,6 @@ keybinds clear-defaults=true {
             SwitchToMode "locked"
         }
         bind "Super k" { ToggleTab; }
-        bind "Super e" { GoToTab 1; SwitchToMode "locked"; }
-        bind "Super o" { GoToTab 2; SwitchToMode "locked"; }
     }
 
     // Command mode (entered via Super+r)
