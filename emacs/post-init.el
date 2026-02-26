@@ -932,7 +932,9 @@ recalculates margins for a new window geometry."
 (use-package treesit-auto
   :ensure t
   :custom
-  (treesit-auto-install 'prompt))
+  (treesit-auto-install t)
+  :config
+  (treesit-auto-install-all))
 
 (setq major-mode-remap-alist
       '((python-mode    . python-ts-mode)
@@ -1595,12 +1597,7 @@ REPORT-FN is the Flymake callback for reporting diagnostics."
   :hook ((typst-ts-mode . eglot-ensure))
   :custom
   (typst-ts-mode-enable-raw-blocks-highlight t)
-  :config
-  (add-to-list 'treesit-language-source-alist
-               '(typst "https://github.com/uben0/tree-sitter-typst"
-                       "master" "src"))
-  (unless (treesit-language-available-p 'typst)
-    (treesit-install-language-grammar 'typst)))
+)
 
 ;; typst-preview: live preview of Typst documents via tinymist.
 ;; Fixed ports allow SSH port forwarding so the preview can be viewed

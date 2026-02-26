@@ -4,6 +4,7 @@
              (gnu home services shepherd)
               (gnu packages emacs)
               (gnu packages fonts)
+               (gnu packages commencement)
                (gnu packages golang)
                (gnu packages golang-apps)
                (gnu packages linux)
@@ -17,8 +18,9 @@
              (gnu services shepherd)
              (guix gexp)
              (minimal-emacs)
-              (opencode)
-               (uv)
+               (opencode)
+               (tinymist)
+                (uv)
                (zellij)
               (zjstatus))
 
@@ -30,16 +32,19 @@
           fish
           font-fira-code
           fzf
+          gcc-toolchain
           go
           gopls
           opencode
           python
           racket
           ripgrep
-          starship
-          uv
-          zellij
-          zoxide))
+           starship
+           tinymist
+           typst
+           uv
+           zellij
+           zoxide))
  (services
   (list
    ;; Fish shell configuration
