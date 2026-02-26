@@ -550,6 +550,13 @@
                          "*-tests.el" "LICENSE" "README*" "*-pkg.el"))
               :source "elpaca-menu-lock-file" :protocol https :inherit t :depth
               treeless :ref "dda84d38fffdaf0c9b12837b504b402af910d01d"))
+ (switchy-window :source "elpaca-menu-lock-file" :recipe
+                 (:package "switchy-window" :repo
+                           ("https://git.sr.ht/~tsdh/switchy-window"
+                            . "switchy-window")
+                           :files ("*" (:exclude ".git")) :source "GNU ELPA"
+                           :protocol https :inherit t :depth treeless :ref
+                           "3ac4e522231a052e9beaa2d25478090d1215c7ae"))
  (symex :source "elpaca-menu-lock-file" :recipe
         (:source "elpaca-menu-lock-file" :protocol https :inherit t :depth
                  treeless :host github :repo "drym-org/symex.el" :files

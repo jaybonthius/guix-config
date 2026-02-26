@@ -799,6 +799,15 @@ takes priority and the underlying mode's keys are suppressed."
   (require 'flash-isearch)
   (flash-isearch-mode 1))
 
+;; Switchy-window: MRU-based window switching. Pressing the key in
+;; quick succession cycles windows by recency; pausing locks the
+;; selection.
+(use-package switchy-window
+  :ensure t
+  :bind ("s-o" . switchy-window)
+  :init
+  (switchy-window-minor-mode))
+
 ;;; ============================================================================
 ;;; Git
 ;;; ============================================================================
@@ -960,6 +969,9 @@ recalculates margins for a new window geometry."
 ;;; ============================================================================
 ;;; Session & buffer management
 ;;; ============================================================================
+
+;; Kill the current buffer immediately instead of prompting.
+(keymap-global-set "C-x k" #'kill-current-buffer)
 
 ;; easysession: persist and restore file buffers, indirect buffers/clones,
 ;; Dired buffers, windows/splits, tab-bar state, and frames across sessions.
