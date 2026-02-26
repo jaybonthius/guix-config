@@ -1162,7 +1162,20 @@ while-loop will automatically reconnect once the new daemon is up."
   (cl-defmethod project-root ((project (head go-module)))
     (cdr project))
 
-  (add-hook 'project-find-functions #'jb-project-find-go-module))
+  (add-hook 'project-find-functions #'jb-project-find-go-module)
+
+  ;; Project dispatch menu: shown after selecting a project via
+  ;; `project-switch-project'.  Wire up consult-based commands so
+  ;; the dispatch menu matches our C-x p keybindings.
+  (setq project-switch-commands
+        '((consult-project-extra-find "Find file" ?f)
+          (consult-project-buffer "Buffer" ?b)
+          (consult-ripgrep "Ripgrep" ?r)
+          (project-find-dir "Find directory" ?d)
+          (magit-project-status "Magit" ?m)
+          (project-vc-dir "VC-Dir" ?v)
+          (project-shell "Shell" ?s)
+          (project-eshell "Eshell" ?e))))
 
 ;; go-ts-mode: tree-sitter based Go major mode (built-in).
 ;; Hooks: eglot for LSP, format + organize imports on save.
