@@ -294,6 +294,13 @@ with clickable error locations."
   :config
   (auto-olivetti-mode))
 
+;;; org-modern: modern styling for Org buffers.
+
+(use-package org-modern
+  :ensure t
+  :hook ((org-mode . org-modern-mode)
+         (org-agenda-finalize . org-modern-agenda)))
+
 ;;; hl-todo: highlight TODO/FIXME/etc keywords.
 
 (use-package hl-todo

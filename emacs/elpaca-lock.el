@@ -447,6 +447,19 @@
                       :source "elpaca-menu-lock-file" :protocol https :inherit t
                       :depth treeless :ref
                       "3a2a32181f7a5bd7b633e40d89de771a5dd88cc7"))
+ (org-modern :source "elpaca-menu-lock-file" :recipe
+             (:package "org-modern" :repo "minad/org-modern" :fetcher github
+                       :files
+                       ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo"
+                        "doc/dir" "doc/*.info" "doc/*.texi" "doc/*.texinfo"
+                        "lisp/*.el" "docs/dir" "docs/*.info" "docs/*.texi"
+                        "docs/*.texinfo"
+                        (:exclude ".dir-locals.el" "test.el" "tests.el"
+                                  "*-test.el" "*-tests.el" "LICENSE" "README*"
+                                  "*-pkg.el"))
+                       :source "elpaca-menu-lock-file" :protocol https :inherit
+                       t :depth treeless :ref
+                       "b4b5b1c864f1fdf240d1bbd7093529f5a75e8a06"))
  (page-break-lines :source "elpaca-menu-lock-file" :recipe
                    (:package "page-break-lines" :fetcher github :repo
                              "purcell/page-break-lines" :files
